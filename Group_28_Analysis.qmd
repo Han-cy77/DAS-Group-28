@@ -3,3 +3,49 @@ title: "Group_28_Analysis.qmd"
 format: html
 editor: visual
 ---
+
+# 1. Background and Target of Research
+
+# 2. Exploratory Data analysis
+
+## 1.Import data and modify the columns
+
+```{r}
+#| message: false
+library(dplyr)
+# import dataset and handle missing values
+original_data <- read.csv('dataset28.csv', na.strings = '?,')
+sum(is.na(original_data))
+original_data <- na.omit(original_data)
+dim(original_data)
+
+# modify the Education column
+# use 'Higher' to represent higher education level
+# use 'Lower' to represent lower education level
+unique(original_data$Education)
+modified_data <- original_data
+modified_data$Education_level <- ifelse(original_data$Education %in% c("Bachelors,", "Masters,", "Doctorate,", "Prof-school,", "Assoc-acdm,", "Assoc-voc,", "Some-college,"),"Higher", "Lower")
+
+# modify the Marital_Status column
+# use 'Yes' or 'No' to represent whether a person has or not has 
+unique(original_data$Marital_Status)
+modified_data$Has_partner <- ifelse(original_data$Marital_Status %in% c("Married-civ-spouse,", "Married-AF-spouse,"), "Yes", "No")
+
+# modify the Nationality column
+unique(original_data$Nationality)
+modified_data$Nationality <- ifelse(original_data$Nationality %in% c('United-States,'), 'US_mainland', 'Others')
+
+# delete useless columns
+modified_data <- modified_data %>% 
+  select(-c(Education, Marital_Status, ))
+
+# modify other columns
+columns_to_clean <- c('Occupation', 'Sex', 'Hours_PW')
+modified_data[columns_to_clean] <- lapply(modified_data[columns_to_clean], function(x) gsub(",$", "", x))
+
+# check the modified data
+dim(modified_data)
+summary(modified_data)
+
+# use chart and boxplots to summary the dataset 
+```
