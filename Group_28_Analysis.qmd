@@ -8,7 +8,7 @@ editor: visual
 
 # 2. Exploratory Data analysis
 
-## 1.Import data and modify the columns
+## 1. Import data and modify the columns
 
 ```{r}
 #| message: false
@@ -46,6 +46,76 @@ modified_data[columns_to_clean] <- lapply(modified_data[columns_to_clean], funct
 # check the modified data
 dim(modified_data)
 summary(modified_data)
+```
 
-# use chart and boxplots to summary the dataset 
+## 2. Check for Multi-Collinearity issues
+
+```{r}
+#| message: false
+library(car)
+# convert all variables including categorical variables into numeric variables
+modified_data_numeric <- modified_data %>%
+  mutate_if(is.character, as.factor) %>%
+  mutate_if(is.factor, as.numeric)
+
+VIF_model <- lm(Income ~ ., data = modified_data_numeric)
+
+# calculate VIF
+vif_values <- vif(VIF_model)
+print(vif_values)
+
+high_vif <- vif_values[vif_values > 10]
+if (length(high_vif) > 0) {
+  print("Variables with multicollinearity problem:")
+  print(high_vif)
+} else {
+  print("There is no serious multicollinearity problem.")
+}
+
+```
+
+## 3. Check sample balance
+
+```{r}
+#| message: false
+# calculate the sample sizes and proportions of different response
+table(modified_data$Income)
+prop.table(table(modified_data$Income))
+
+```
+
+## 4. Data visualization
+
+Use chart and plots to summarize the data set.
+
+```{r}
+#| message: false
+str(modified_data)
+```
+
+TBD: contingency tables and barplots
+
+# 3. Data Splitting: Training set and Test set
+
+```{r}
+#| message: false
+library(caret)
+# set random seed
+set.seed(123)
+
+# create training index for stratified sampling
+training_index <- createDataPartition(modified_data$Income, p = 0.8, list = FALSE)
+
+# split data into training data and test data
+training_data <- modified_data[training_index, ]
+test_data  <- modified_data[-training_index, ]
+
+# check dimension
+dim(training_data)
+dim(test_data)
+
+# check distribution in both datasets
+prop.table(table(training_data$Income))
+prop.table(table(test_data$Income))
+
 ```
