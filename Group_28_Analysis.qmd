@@ -9,37 +9,12 @@ editor: visual
 This dataset was collected from the US 1994 Census database, which contains demographic and socioeconomic data of individuals. The dataset include several variables that are crucial for understanding the factors influencing income levels. Below is a description of each variable and its relevance to the research:
 
 -   **Age**: The age of the individual, measured in years. Age can be a significant factor influencing income, as individuals in different age groups may have different levels of experience, job opportunities, and earning potential.
-
-```{=html}
-<!-- -->
-```
 -   **Education**: The highest level of education attained by the individual. This variable records the educational background of the person, which is often a strong predictor of income. Higher education levels are generally associated with higher-paying jobs.
-
-```{=html}
-<!-- -->
-```
 -   **Marital_Status**: The marital status may affect income through various social and economic factors, such as household income or access to benefits.
-
 -   **Occupation**: The occupation of the individual. Different occupations have different income levels, and certain jobs may be more likely to offer higher wages.
-
-```{=html}
-<!-- -->
-```
 -   **Sex**: The sex of the individual. Gender may play a role in income, as men and women have experienced different pay scales for the same or similar work.
-
-```{=html}
-<!-- -->
-```
 -   **Hours_PW**: The number of hours worked per week by the individual. Income is often correlated with the number of hours worked, as individuals working longer hours may earn more.
-
-```{=html}
-<!-- -->
-```
 -   **Nationality**: The nationality of birth of the individual.
-
-```{=html}
-<!-- -->
-```
 -   **Income**: The response variable in the dataset, which indicates whether the individual earns more than \$50k per year (`>50k`) or less than or equal to \$50k (`<=50k`). This is the variable of interest in this study, as the goal is to determine which factors influence an individual’s income level.
 
 In this research, the target is to identify the factors that influence whether an individual earns more than \$50k per year. A Generalized Linear Model (GLM) will be applied to explore how variables like age, education level, marital status, occupation, sex, hours worked per week, and nationality contribute to income levels. The findings will help understand the key factors that determine high income and inform policies related to employment, education, and socioeconomic conditions.
