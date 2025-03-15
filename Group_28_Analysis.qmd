@@ -91,11 +91,16 @@ Use chart and plots to summarize the data set.
 ```{r}
 #| message: false
 library(ggplot2)
+library(knitr)
 
 # Contingency Tables and Barplots for Categorical variables
 # Occupation
 Occupation_Income_table <- table(modified_data$Occupation, modified_data$Income)
-print(Occupation_Income_table)
+Occupation_proportion <- prop.table(Occupation_Income_table)
+
+kable(Occupation_Income_table, caption = "Contingency Table: Occupation vs Income")
+kable(Occupation_proportion, caption = "Proportion Table: Occupation vs Income")
+
 
 ggplot(data = modified_data, mapping = aes(x = Occupation, fill = Income)) +
   geom_bar(position = 'dodge') +
@@ -111,7 +116,10 @@ ggplot(data = modified_data, mapping = aes(x = Occupation, fill = Income)) +
 #| message: false
 # Sex
 Sex_Income_table <- table(modified_data$Sex, modified_data$Income)
-print(Sex_Income_table)
+Sex_proportion <- prop.table(Sex_Income_table)
+
+kable(Sex_Income_table, caption = "Contingency Table: Sex vs Income")
+kable(Sex_proportion, caption = "Proportion Table: Sex vs Income")
 
 ggplot(data = modified_data, mapping = aes(x = Sex, fill = Income)) +
   geom_bar(position = 'dodge') +
@@ -126,7 +134,10 @@ ggplot(data = modified_data, mapping = aes(x = Sex, fill = Income)) +
 #| message: false
 # Nationality
 Nationality_Income_table <- table(modified_data$Nationality, modified_data$Income)
-print(Nationality_Income_table)
+Nationality_proportion <- prop.table(Nationality_Income_table)
+
+kable(Nationality_Income_table, caption = "Contingency Table: Nationality vs Income")
+kable(Nationality_proportion, caption = "Proportion Table: Nationality vs Income")
 
 ggplot(data = modified_data, mapping = aes(x = Nationality, fill = Income)) +
   geom_bar(position = 'dodge') +
@@ -141,7 +152,10 @@ ggplot(data = modified_data, mapping = aes(x = Nationality, fill = Income)) +
 #| message: false
 # Education level
 Education_Income_table <- table(modified_data$Education_level, modified_data$Income)
-print(Education_Income_table)
+Education_proportion <- prop.table(Education_Income_table)
+
+kable(Education_Income_table, caption = "Contingency Table: Education level vs Income")
+kable(Education_proportion, caption = "Proportion Table: Education level vs Income")
 
 ggplot(data = modified_data, mapping = aes(x = Education_level, fill = Income)) +
   geom_bar(position = 'dodge') +
@@ -156,7 +170,10 @@ ggplot(data = modified_data, mapping = aes(x = Education_level, fill = Income)) 
 #| message: false
 # Partner
 Partner_Income_table <- table(modified_data$Has_partner, modified_data$Income)
-print(Partner_Income_table)
+Partner_proportion <- prop.table(Partner_Income_table)
+
+kable(Partner_Income_table, caption = "Contingency Table: Partner vs Income")
+kable(Partner_proportion, caption = "Proportion Table: Partner vs Income")
 
 ggplot(data = modified_data, mapping = aes(x = Has_partner, fill = Income)) +
   geom_bar(position = 'dodge') +
