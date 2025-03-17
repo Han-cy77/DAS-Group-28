@@ -84,9 +84,18 @@ str(modified_data)
 library(car)
 # convert all variables including categorical variables into numeric variables
 modified_data_numeric <- modified_data %>%
+  # convert Education_level as 1, 2, 3
   mutate(
     Education_level = as.numeric(factor(Education_level, levels = c("Lower", "Medium", "Higher")))
   ) %>%
+  # other categorical variables converted to 0 and 1
+  mutate(
+    Sex = ifelse(Sex == levels(Sex)[1], 0, 1),
+    Nationality = ifelse(Nationality == levels(Nationality)[1], 0, 1),
+    Income = ifelse(Income == levels(Income)[1], 0, 1),
+    Has_partner = ifelse(Has_partner == levels(Has_partner)[1], 0, 1)
+  ) %>%
+  # others converted to numerical
   mutate_if(is.factor, as.numeric)
 
 VIF_model <- lm(Income ~ ., data = modified_data_numeric)
