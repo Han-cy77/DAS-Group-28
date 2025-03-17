@@ -244,11 +244,11 @@ library(caret)
 set.seed(123)
 
 # create training index for stratified sampling
-training_index <- createDataPartition(modified_data_numeric$Income, p = 0.8, list = FALSE)
+training_index <- createDataPartition(modified_data$Income, p = 0.8, list = FALSE)
 
 # split data into training data and test data
-training_data <- modified_data_numeric[training_index, ]
-test_data  <- modified_data_numeric[-training_index, ]
+training_data <- modified_data[training_index, ]
+test_data  <- modified_data[-training_index, ]
 str(training_data)
 str(test_data)
 
@@ -259,4 +259,39 @@ dim(test_data)
 # check distribution in both datasets
 prop.table(table(training_data$Income))
 prop.table(table(test_data$Income))
+```
+
+```{r}
+#| message: false
+library(MASS)
+library(caret)
+library(pROC)
+library(pscl)
+
+
+full_model <- glm(Income ~ (Age + Occupation + Sex + Hours_PW + Nationality + Education_level + Has_partner)^2, 
+                  data = training_data, family = binomial)
+
+
+step_model <- stepAIC(full_model, direction = "both", trace = FALSE)
+summary(step_model)
+
+
+test_data$predicted_prob <- predict(step_model, newdata = test_data, type = "response")
+test_data$predicted_class <- ifelse(test_data$predicted_prob >= 0.5, ">50K", "<=50K")
+test_data$predicted_class <- factor(test_data$predicted_class, levels = levels(test_data$Income))
+
+
+conf_matrix <- confusionMatrix(test_data$predicted_class, test_data$Income)
+print(conf_matrix)
+
+
+roc_curve <- roc(test_data$Income, test_data$predicted_prob)
+auc_score <- auc(roc_curve)
+print(auc_score)
+plot(roc_curve, col = "blue", main = "ROC Curve for Logistic Regression")
+
+
+pseudo_r2 <- pR2(step_model)
+print(pseudo_r2)
 ```
