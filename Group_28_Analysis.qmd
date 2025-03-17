@@ -27,7 +27,7 @@ modified_data <- original_data
 modified_data$Education_level <- ifelse(original_data$Education %in% c("Bachelors,", "Masters,", "Doctorate,", "Prof-school,", "Assoc-acdm,", "Assoc-voc,", "Some-college,"),"Higher", "Lower")
 
 # modify the Marital_Status column
-# use 'Yes' or 'No' to represent whether a person has or not has 
+# use 'Yes' or 'No' to represent whether a person has or not has partner
 unique(original_data$Marital_Status)
 modified_data$Has_partner <- ifelse(original_data$Marital_Status %in% c("Married-civ-spouse,", "Married-AF-spouse,"), "Yes", "No")
 
