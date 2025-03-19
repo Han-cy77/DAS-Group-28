@@ -408,12 +408,12 @@ auc(roc_curve)  # Compute AUC value
 plot(roc_curve) # Plot ROC curve
 
 ```
-In the model optimization process, we first selected the optimal main effects model by applying main effect selection, ANOVA interaction testing, and stepwise AIC optimization, aiming to construct a more robust model. Variables with statistical significance (p < 0.05) were retained, while non-significant variables (p > 0.1) were removed. The residual deviance of the current model was 773.01, indicating that it explained a substantial amount of the data variability. The AIC value was 793.01, and the Number of Fisher Scoring iterations was 6, suggesting that the model was relatively stable.
 
-Subsequently, we examined potential interaction effects to assess their additional explanatory power. The ANOVA test revealed significant interaction effects (p < 0.05), leading to further optimization using stepAIC(), which resulted in the final model. To evaluate the model’s predictive performance, we computed the AUC, obtaining a value of 0.8871, which suggests a strong predictive ability.
+In the model optimization process, we first selected the optimal main effects model by applying main effect selection, ANOVA interaction testing, and stepwise AIC optimization, aiming to construct a more robust model. Variables with statistical significance (p \< 0.05) were retained, while non-significant variables (p \> 0.1) were removed. The residual deviance of the current model was 773.01, indicating that it explained a substantial amount of the data variability. The AIC value was 793.01, and the Number of Fisher Scoring iterations was 6, suggesting that the model was relatively stable.
 
-We then examined multicollinearity using the VIF test. The results initially indicated that OccupationService_Labor_jobs (VIF = 12.626) and OccupationService_Labor_jobs:Hours_PW (VIF = 12.196) had VIF values exceeding 10, suggesting a severe multicollinearity issue. However, since OccupationService_Labor_jobs:Hours_PW was statistically significant (p < 0.05), it was not appropriate to simply remove this interaction term. Instead, we applied variable standardization to mitigate collinearity. After standardizing the relevant variables, a subsequent VIF test confirmed that all VIF values were below 2, indicating that the collinearity issue was effectively resolved.
+Subsequently, we examined potential interaction effects to assess their additional explanatory power. The ANOVA test revealed significant interaction effects (p \< 0.05), leading to further optimization using stepAIC(), which resulted in the final model. To evaluate the model’s predictive performance, we computed the AUC, obtaining a value of 0.8871, which suggests a strong predictive ability.
 
+We then examined multicollinearity using the VIF test. The results initially indicated that OccupationService_Labor_jobs (VIF = 12.626) and OccupationService_Labor_jobs:Hours_PW (VIF = 12.196) had VIF values exceeding 10, suggesting a severe multicollinearity issue. However, since OccupationService_Labor_jobs:Hours_PW was statistically significant (p \< 0.05), it was not appropriate to simply remove this interaction term. Instead, we applied variable standardization to mitigate collinearity. After standardizing the relevant variables, a subsequent VIF test confirmed that all VIF values were below 2, indicating that the collinearity issue was effectively resolved.
 
 ## 2. Random Forests
 
@@ -422,7 +422,10 @@ library(randomForest)
 library(caret)        
 library(pROC)         
 library(rpart.plot)
-          
+
+training_data <- modified_data[training_index, ]
+test_data  <- modified_data[-training_index, ]
+
 training_data$Income <- as.factor(training_data$Income)
 test_data$Income <- as.factor(test_data$Income)
 
@@ -485,6 +488,8 @@ roc_curve <- roc(test_data$Income, test_data$predicted_prob)
 auc_score <- auc(roc_curve)
 print(auc_score)
 plot(roc_curve, col = "blue", main = "ROC Curve for Random Forest Model")
+
+
 ```
 
 The OOB error rate is 17.06%, which means the model misclassifies approximately 17.06% of the training data on average. This is a good estimate of the model's generalization error. The model achieves good accuracy (80.59%) and a high AUC score (0.8632), indicating strong overall performance. However, the lower specificity for the \>50K class highlights the need to address class imbalance and refine the model further. Has_partner is the most important variable for accuracy, suggesting it plays a critical role in predicting income. From the variable importance plot, we can indicate that Age and Education_level are also highly important, which aligns with real-world intuition (income often correlates with age and education).
