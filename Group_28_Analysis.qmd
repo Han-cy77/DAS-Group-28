@@ -55,8 +55,9 @@ modified_data <- modified_data %>%
   )
 
 # delete useless columns
-modified_data <- modified_data %>% 
-  select(-c(Education, Marital_Status))
+modified_data <- modified_data %>%
+  dplyr::select(-Education, -Marital_Status)
+
 
 # modify other columns
 columns_to_clean <- c('Sex', 'Hours_PW')
@@ -252,6 +253,26 @@ test_data  <- modified_data[-training_index, ]
 str(training_data)
 str(test_data)
 
+# Replace Spaces and ampersand with underscores _
+training_data$Occupation <- gsub(" & ", "_", training_data$Occupation)  
+training_data$Occupation <- gsub(" ", "_", training_data$Occupation)    
+
+test_data$Occupation <- gsub(" & ", "_", test_data$Occupation)  
+test_data$Occupation <- gsub(" ", "_", test_data$Occupation)
+
+# Make sure the variable is still a factor type
+training_data$Occupation <- as.factor(training_data$Occupation)
+
+test_data$Occupation <- as.factor(test_data$Occupation)
+
+# View the modified categories
+levels(training_data$Occupation)
+
+levels(test_data$Occupation)
+
+
+
+
 # check dimension
 dim(training_data)
 dim(test_data)
@@ -272,6 +293,27 @@ library(caret)
 library(pROC)
 library(pscl)
 
+# Create dummy variables
+dummy_variables <- model.matrix(~ Occupation - 1, data = training_data)
+education_dummy <- model.matrix(~ Education_level - 1, data = training_data)
+nationality_dummy <- model.matrix(~ Nationality - 1, data = training_data)
+has_partner_dummy <- model.matrix(~ Has_partner - 1, data = training_data)
+sex_dummy <- model.matrix(~ Sex - 1, data = training_data)
+has_partner_dummy <- model.matrix(~ Has_partner - 1, data = training_data)
+
+#Check new variables
+colnames(dummy_variables)
+colnames(education_dummy)
+colnames(nationality_dummy)
+colnames(has_partner_dummy)
+colnames(sex_dummy)
+
+# Add the dummy variables into the original dataset
+training_data <- cbind(training_data, dummy_variables)
+training_data <- cbind(training_data, education_dummy)
+training_data <- cbind(training_data, nationality_dummy)
+training_data <- cbind(training_data, has_partner_dummy)
+training_data <- cbind(training_data, sex_dummy)
 
 full_model <- glm(Income ~ (Age + Occupation + Sex + Hours_PW + Nationality + Education_level + Has_partner)^2, 
                   data = training_data, family = binomial)
@@ -299,6 +341,79 @@ plot(roc_curve, col = "blue", main = "ROC Curve for Logistic Regression")
 pseudo_r2 <- pR2(step_model)
 print(pseudo_r2)
 ```
+
+```{r}
+# Load necessary libraries
+library(MASS)  # stepAIC()
+library(car)   # VIF
+library(pROC)  # AUC calculation
+library(dplyr) # Data manipulation
+
+# Step 1: Select the best main effects model
+base_model <- glm(Income ~ Age + Occupation + Sex + Hours_PW + Nationality + Education_level + Has_partner, 
+                  data = training_data, family = binomial)
+
+step_base_model <- stepAIC(base_model, direction = "both", trace = FALSE)
+
+summary(step_base_model)  # View the optimized main effects model
+
+# Step 2: Check interaction effects
+interaction_model <- glm(Income ~ Age + Occupation + Hours_PW + Nationality + 
+                           Education_level + Has_partner +
+                           Education_level:Occupation + Hours_PW:Occupation,
+                         data = training_data, family = binomial)
+
+anova(step_base_model, interaction_model, test = "Chisq")  # Perform likelihood ratio test
+
+# Step 3: Use stepAIC() to select the final model
+final_model <- stepAIC(interaction_model, direction = "both", trace = FALSE)
+
+summary(final_model)  # View the final model
+
+# Step 4: Generate dummy variables (Ensure that OccupationService_Labor_jobs exists)
+training_data$Occupation <- as.factor(training_data$Occupation)
+occupation_dummy <- model.matrix(~ Occupation - 1, data = training_data) %>% as.data.frame()
+training_data <- cbind(training_data, occupation_dummy)
+
+# Check if `OccupationService_Labor_jobs` is included
+colnames(training_data)
+
+# Step 5: Refit the final optimized model
+final_model_refined <- glm(Income ~ Age + OccupationService_Labor_jobs + Hours_PW + 
+                             Nationality + Education_level + Has_partner + 
+                             OccupationService_Labor_jobs:Hours_PW, 
+                           family = binomial, data = training_data)
+
+summary(final_model_refined)  # Check statistical significance
+
+# Step 6: Check VIF (Multicollinearity)
+vif(final_model_refined)
+
+# Standardize variables
+training_data$Hours_PW <- scale(training_data$Hours_PW)
+training_data$OccupationService_Labor_jobs <- scale(training_data$OccupationService_Labor_jobs)
+
+# Refit the model
+final_model_refined <- glm(Income ~ Age + OccupationService_Labor_jobs + Hours_PW + 
+                             Nationality + Education_level + Has_partner + 
+                             OccupationService_Labor_jobs:Hours_PW, 
+                           family = binomial, data = training_data)
+
+# Recheck VIF
+vif(final_model_refined)
+
+# Step 7: Compute AUC to evaluate classification performance
+roc_curve <- roc(training_data$Income, fitted(final_model_refined))
+auc(roc_curve)  # Compute AUC value
+plot(roc_curve) # Plot ROC curve
+
+```
+In the model optimization process, we first selected the optimal main effects model by applying main effect selection, ANOVA interaction testing, and stepwise AIC optimization, aiming to construct a more robust model. Variables with statistical significance (p < 0.05) were retained, while non-significant variables (p > 0.1) were removed. The residual deviance of the current model was 773.01, indicating that it explained a substantial amount of the data variability. The AIC value was 793.01, and the Number of Fisher Scoring iterations was 6, suggesting that the model was relatively stable.
+
+Subsequently, we examined potential interaction effects to assess their additional explanatory power. The ANOVA test revealed significant interaction effects (p < 0.05), leading to further optimization using stepAIC(), which resulted in the final model. To evaluate the model’s predictive performance, we computed the AUC, obtaining a value of 0.8871, which suggests a strong predictive ability.
+
+We then examined multicollinearity using the VIF test. The results initially indicated that OccupationService_Labor_jobs (VIF = 12.626) and OccupationService_Labor_jobs:Hours_PW (VIF = 12.196) had VIF values exceeding 10, suggesting a severe multicollinearity issue. However, since OccupationService_Labor_jobs:Hours_PW was statistically significant (p < 0.05), it was not appropriate to simply remove this interaction term. Instead, we applied variable standardization to mitigate collinearity. After standardizing the relevant variables, a subsequent VIF test confirmed that all VIF values were below 2, indicating that the collinearity issue was effectively resolved.
+
 
 ## 2. Random Forests
 
