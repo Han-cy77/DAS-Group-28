@@ -270,9 +270,6 @@ levels(training_data$Occupation)
 
 levels(test_data$Occupation)
 
-
-
-
 # check dimension
 dim(training_data)
 dim(test_data)
@@ -284,7 +281,8 @@ prop.table(table(test_data$Income))
 
 # 4. Model fitting
 
-## 1. GLM
+## 4.1 GLM Model
+### 4.1.1 GLM Model building
 
 ```{r}
 #| message: false
@@ -342,6 +340,7 @@ pseudo_r2 <- pR2(step_model)
 print(pseudo_r2)
 ```
 
+### 4.1.2 GLM Model optimization
 ```{r}
 # Load necessary libraries
 library(MASS)  # stepAIC()
@@ -415,7 +414,7 @@ Subsequently, we examined potential interaction effects to assess their addition
 
 We then examined multicollinearity using the VIF test. The results initially indicated that OccupationService_Labor_jobs (VIF = 12.626) and OccupationService_Labor_jobs:Hours_PW (VIF = 12.196) had VIF values exceeding 10, suggesting a severe multicollinearity issue. However, since OccupationService_Labor_jobs:Hours_PW was statistically significant (p \< 0.05), it was not appropriate to simply remove this interaction term. Instead, we applied variable standardization to mitigate collinearity. After standardizing the relevant variables, a subsequent VIF test confirmed that all VIF values were below 2, indicating that the collinearity issue was effectively resolved.
 
-## 2. Random Forests
+## 4.2 Random Forests
 
 ```{r}
 library(randomForest)  
