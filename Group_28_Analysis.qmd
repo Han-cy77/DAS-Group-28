@@ -873,8 +873,8 @@ training_index <- createDataPartition(modified_data$Income, p = 0.8, list = FALS
 # split data into training data and test data
 training_data <- modified_data[training_index, ]
 test_data  <- modified_data[-training_index, ]
-str(training_data)
-str(test_data)
+#str(training_data)
+#str(test_data)
 
 # Replace Spaces and ampersand with underscores _
 training_data$Occupation <- gsub(" & ", "_", training_data$Occupation)  
@@ -893,9 +893,6 @@ levels(training_data$Occupation)
 
 levels(test_data$Occupation)
 
-
-
-
 # check dimension
 dim(training_data)
 dim(test_data)
@@ -904,6 +901,26 @@ dim(test_data)
 prop.table(table(training_data$Income))
 prop.table(table(test_data$Income))
 ```
+
+**Class Distribution in the Training data and Test data**
+
+| **Training data** Income Category | Count | Proportion |
+|-----------------------------------|-------|------------|
+| ≤50K                              | 824   | 75.18%     |
+| \>50K                             | 272   | 24.82%     |
+
+In the **Training data**, the proportions are **75.18%** (≤50K) and
+**24.82%** (\>50K), showing only a minimal deviation from the original
+distribution.
+
+| **Test data** Income Category | Count | Proportion |
+|-------------------------------|-------|------------|
+| ≤50K                          | 206   | 75.46%     |
+| \>50K                         | 67    | 24.54%     |
+
+Similarly, in the **Test data**, the proportions are **75.46%** (≤50K)
+and **24.54%** (\>50K), which also aligns well with the original
+dataset.
 
 # Statistical Modelling and Results
 
@@ -1258,13 +1275,13 @@ For practical implications, our findings offer valuable insights for
 Comparative Summary of Models
 
 ::: center
-| Metric | Random Forest Model | GLM Model |
-|----|----|----|
-| **AUC** | 0.8632 | 0.8871 |
-| **Interpretability** | Low (Black Box) | Strong |
-| **Interaction Modeling** | Implicitly Included | Explicitly Modeled |
-| **Model Suitability** | Suitable for High-Dimensional, Nonlinear Data | Suitable for Interpretation and Inference |
-| **Class Balance Sensitivity** | Relatively High | Adjustable via Weighting |
+| Metric                        | Random Forest Model                           | GLM Model                                 |
+|------------------------|------------------------|------------------------|
+| **AUC**                       | 0.8632                                        | 0.8871                                    |
+| **Interpretability**          | Low (Black Box)                               | Strong                                    |
+| **Interaction Modeling**      | Implicitly Included                           | Explicitly Modeled                        |
+| **Model Suitability**         | Suitable for High-Dimensional, Nonlinear Data | Suitable for Interpretation and Inference |
+| **Class Balance Sensitivity** | Relatively High                               | Adjustable via Weighting                  |
 :::
 
 While both GLM and Random Forest demonstrate strong predictive
