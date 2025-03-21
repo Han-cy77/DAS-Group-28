@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-# 1. Background and Target of Research
+# 1. Background and Aims of the Analysis
 
 With the growing importance of data-informed policymaking, identifying the socioeconomic factors that influence individual income has become a critical area of research. Leveraging the 1994 U.S. Census data, this study seeks to explore how personal and demographic characteristics correlate with income levels, particularly whether an individual earns more than \$50,000 per year.
 
@@ -20,12 +20,13 @@ The research objectives are threefold:
 
 This study also addresses key challenges such as class imbalance, multicollinearity, and categorical data encoding, ensuring the reliability and relevance of the final model outputs. By combining classical statistical modeling with modern machine learning techniques, we aim to produce a robust, interpretable, and practically useful analysis of income determinants.
 
-# 2. Exploratory Data analysis
+# 2. Exploratory Data Analysis
 
 ## 1. Import data and modify the columns
 
 ```{r}
 #| message: false
+#| echo: false
 library(dplyr)
 # import dataset and handle missing values
 original_data <- read.csv('dataset28.csv', na.strings = '?,')
@@ -95,45 +96,39 @@ str(modified_data)
 
 The dataset, derived from the 1994 U.S. Census, was imported with missing values represented by `"?"`. After removing rows with any missing values (`na.omit()`), the final cleaned dataset contains **30,162 observations** and **8 core variables** relevant to individual socioeconomic characteristics and income level.
 
-#### **Variable Transformation**
+**Variable Transformation**
 
 To improve interpretability and reduce dimensionality, several categorical variables were recoded as follows:
 
 -   **Education**: Recoded into a new variable `Education_level` with three ordered categories:
 
-```         
--   *Lower* (e.g., primary school)
+\- \*Lower\* (e.g., primary school)
 
--    *Medium* (e.g., high school, some college)
+- \*Medium\* (e.g., high school, some college)
 
--    *Higher* (e.g., Bachelors, Masters, Doctorate)
-```
+- \*Higher\* (e.g., Bachelors, Masters, Doctorate)
 
 -   **Marital_Status**: Simplified to a binary variable `Has_partner`, indicating whether the individual has a spouse or not.
 
 -   **Nationality**: Consolidated into two categories:
 
-```         
--    `US_mainland` for individuals born in the United States
+\- \`US_mainland\` for individuals born in the United States
 
--    `Others` for all other nationalities
-```
+- \`Others\` for all other nationalities
 
 -   **Occupation**: Grouped into four broader categories:
 
-```         
--    *High-skilled jobs* (e.g., professionals, tech support, managers)
+\- \*High-skilled jobs\* (e.g., professionals, tech support, managers)
 
--    *Office & Sales jobs*
+- \*Office & Sales jobs\*
 
--    *Blue-collar jobs* (manual labor, machine operation)
+- \*Blue-collar jobs\* (manual labor, machine operation)
 
--    *Service & Labor jobs* (e.g., farming, cleaning, protective services)
-```
+- \*Service & Labor jobs\* (e.g., farming, cleaning, protective services)
 
 Additionally, all character-based variables had trailing commas removed to ensure consistency, and data types were properly cast: numeric variables (`Age`, `Hours_PW`) and categorical variables (`Sex`, `Income`, etc.).
 
-#### **Descriptive Statistics**
+**Descriptive Statistics**
 
 Below is a high-level summary of the main variables after transformation:
 
@@ -153,7 +148,7 @@ Below is a high-level summary of the main variables after transformation:
 
 -   **Has_partner**: Binary variable which may reflect family structure and economic stability.
 
-#### **Initial Observations**
+**Initial Observations**
 
 -   The dataset is relatively balanced in size and has undergone comprehensive cleaning to remove missing values.
 
@@ -214,6 +209,10 @@ Use chart and plots to summarize the data set.
 
 ```{r}
 #| message: false
+#| label: fig-score1
+#| fig-cap: "Relationships Between Income and Ocupation"
+#| fig-pos: "H"
+
 library(ggplot2)
 
 # Contingency Tables and Barplots for Categorical variables
@@ -231,8 +230,26 @@ ggplot(data = modified_data, mapping = aes(x = Occupation, fill = Income)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
 
+**Occupation vs. Income**
+
+The Figure1 illustrates the relationship between occupation and income distribution:
+
+-    **Blue-collar jobs**: 279 individuals earn **≤50K**, while only 75 earn **\>50K**. This suggests that most blue-collar workers remain in the lower-income bracket.
+
+-    **High-skilled jobs**: 225 individuals earn **≤50K**, while a **significant 187 individuals** earn **\>50K**. This group has the **highest proportion** of high earners.
+
+-    **Office & Sales jobs**: 284 individuals earn **≤50K**, whereas only 54 individuals earn **\>50K**. This suggests that most individuals in this category remain in lower-income brackets.
+
+-    **Service & Labor jobs**: 242 individuals earn **≤50K**, while only 23 exceed the **50K** threshold, indicating **very limited upward income mobility**.
+
+High-skilled jobs show the best income potential, while blue-collar and service jobs predominantly fall within the lower-income group.
+
 ```{r}
 #| message: false
+#| label: fig-score2
+#| fig-cap: "Relationships Between Income and Sex"
+#| fig-pos: "H"
+
 # Sex
 Sex_Income_table <- table(modified_data$Sex, modified_data$Income)
 print(Sex_Income_table)
@@ -246,8 +263,22 @@ ggplot(data = modified_data, mapping = aes(x = Sex, fill = Income)) +
   theme_minimal()
 ```
 
+**Sex vs. Income**
+
+The Figure2 provides insight into gender-based income disparities:
+
+-   **Females**: 383 earn **≤50K**, while only **51 earn \>50K**. This means only **11.8%** of females in the dataset belong to the high-income group.
+
+-   **Males**: 647 earn **≤50K**, while **288 earn \>50K**. In contrast to females, **30.8%** of males surpass the **50K** income level.
+
+Males are nearly three times more likely to earn \>50K than females (30.8% vs. 11.8%), indicating a substantial gender wage gap. This could be due to occupational segregation, work experience, or systemic wage inequality.
+
 ```{r}
 #| message: false
+#| label: fig-score3
+#| fig-cap: "Relationships Between Income and Nationality"
+#| fig-pos: "H"
+
 # Nationality
 Nationality_Income_table <- table(modified_data$Nationality, modified_data$Income)
 print(Nationality_Income_table)
@@ -261,8 +292,22 @@ ggplot(data = modified_data, mapping = aes(x = Nationality, fill = Income)) +
   theme_minimal()
 ```
 
+**Nationality vs. Income**
+
+The Figure3 explores how income distribution varies by nationality:
+
+-   **US Mainland-born individuals**: 924 earn **≤50K**, while **316 earn \>50K**. This means **25.5%** of this group reaches high-income status.
+
+-   **Others (foreign-born individuals)**: 106 earn **≤50K**, whereas only **23 individuals** earn **\>50K**, meaning only **17.8%** enter the high-income bracket.
+
+Individuals born in the US Mainland are more likely to earn \>50K (25.5%) compared to those born elsewhere (17.8%). This suggests that US-born individuals may have an advantage in accessing higher-paying jobs, possibly due to factors such as language proficiency, education access, or reduced work restrictions.
+
 ```{r}
 #| message: false
+#| label: fig-score4
+#| fig-cap: "Relationships Between Income and Education level"
+#| fig-pos: "H"
+
 # Education level
 Education_Income_table <- table(modified_data$Education_level, modified_data$Income)
 print(Education_Income_table)
@@ -276,8 +321,24 @@ ggplot(data = modified_data, mapping = aes(x = Education_level, fill = Income)) 
   theme_minimal()
 ```
 
+**Education Level vs. Income**
+
+The Figure4 examines the impact of education on income:
+
+-    **Higher Education (Bachelor’s, Master’s, Doctorate, etc.)**: **165 earn ≤50K**, while **173 earn \>50K**. Notably, this is **the only group where more individuals earn \>50K than ≤50K**.
+
+-    **Medium Education (High school graduates, associate degrees, some college)**: **715 earn ≤50K**, whereas only **153 earn \>50K**, meaning only **17.6% of this group achieves high income**.
+
+-    **Lower Education (Elementary/Middle school and below)**: **150 earn ≤50K**, and only **13 earn \>50K**, meaning an extremely low **8.0%** of this group surpasses the **50K** income level.
+
+Higher education significantly increases the probability of earning \>50K. Nearly 51.2% of highly educated individuals enter the high-income bracket, compared to 17.6% for medium education and just 8.0% for lower education. This highlights education as a major determinant of economic mobility.
+
 ```{r}
 #| message: false
+#| label: fig-score5
+#| fig-cap: "Relationships Between Income and Partner"
+#| fig-pos: "H"
+
 # Partner
 Partner_Income_table <- table(modified_data$Has_partner, modified_data$Income)
 print(Partner_Income_table)
@@ -291,8 +352,22 @@ ggplot(data = modified_data, mapping = aes(x = Has_partner, fill = Income)) +
   theme_minimal()
 ```
 
+**Marital Status vs. Income (Partner vs. Income)**
+
+The Figure5 investigates the impact of marital status on income:
+
+-    **Individuals without a partner**: **675 earn ≤50K**, while only **44 earn \>50K**. This means only **6.1%** of single individuals surpass the **50K** threshold.
+
+-    **Individuals with a partner**: **355 earn ≤50K**, while **295 earn \>50K**, meaning **45.4%** earn \>50K.
+
+Key Insight: Individuals with a partner are significantly more likely to earn \>50K (45.4%) than those without a partner (6.1%). This might be due to dual-income households, financial stability, or career advancement associated with family life.
+
 ```{r}
 #| message: false
+#| label: fig-score6
+#| fig-cap: "Relationships Between Income and Age"
+#| fig-pos: "H"
+
 # Violin plots and boxplots for numerical continuous variables
 # Age
 ggplot(data = modified_data, aes(x = Income, y = Age, fill = Income)) +
@@ -304,8 +379,16 @@ ggplot(data = modified_data, aes(x = Income, y = Age, fill = Income)) +
 
 ggplot(modified_data, aes(x = Income, y = Age, fill = Income)) +
   geom_boxplot() +
-  labs(title = "Age vs Income", x = "Age", y = "Hours per Week") +
+  labs(title = "Age vs Income", x = "Income", y = "Age") +
   theme_minimal()
+
+```
+
+```{r}
+#| message: false
+#| label: fig-score7
+#| fig-cap: "Relationships Between Income and Hours Per Week"
+#| fig-pos: "H"
 
 # Hours per week
 ggplot(data = modified_data, aes(x = Income, y = Hours_PW, fill = Income)) +
@@ -367,7 +450,7 @@ prop.table(table(training_data$Income))
 prop.table(table(test_data$Income))
 ```
 
-# 4. Model fitting
+# 4. Statistical Modelling and Results
 
 ## 4.1 GLM
 
@@ -601,3 +684,5 @@ plot(roc_curve, col = "blue", main = "ROC Curve for Random Forest Model")
 ```
 
 The OOB error rate is 17.06%, which means the model misclassifies approximately 17.06% of the training data on average. This is a good estimate of the model's generalization error. The model achieves good accuracy (80.59%) and a high AUC score (0.8632), indicating strong overall performance. However, the lower specificity for the \>50K class highlights the need to address class imbalance and refine the model further. Has_partner is the most important variable for accuracy, suggesting it plays a critical role in predicting income. From the variable importance plot, we can indicate that Age and Education_level are also highly important, which aligns with real-world intuition (income often correlates with age and education).
+
+# 5. Conclusions and Future work
