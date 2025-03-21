@@ -1,153 +1,28 @@
 ---
-title: "Generalised Linear Model Analysis"
-author: "Group 28"
-number-sections: true
-format: 
-  html:
-    embed-resources: true
-    code-tools: true
-  pdf: 
-    number-sections: true
-    fig-pos: "H"
-    tbl-pos: "H"
-editor_options: 
-  chunk_output_type: console
-execute:
-  echo: true
-  eval: true
-  warning: false
-  message: false
-editor: 
-  markdown: 
-    wrap: 72
+title: "Group_28_Analysis.qmd"
+format: html
+editor: visual
 ---
 
-# Background and Aims of the Analysis
+# 1. Background and Aims of the Analysis
 
-With the growing importance of data-informed policymaking, identifying
-the socioeconomic factors that influence individual income has become a
-critical area of research. Leveraging the 1994 U.S. Census data, this
-study seeks to explore how personal and demographic characteristics
-correlate with income levels, particularly whether an individual earns
-more than \$50,000 per year.
+With the growing importance of data-informed policymaking, identifying the socioeconomic factors that influence individual income has become a critical area of research. Leveraging the 1994 U.S. Census data, this study seeks to explore how personal and demographic characteristics correlate with income levels, particularly whether an individual earns more than \$50,000 per year.
 
-The dataset includes various attributes such as age, education, marital
-status, occupation, sex, weekly working hours, and nationality. These
-features are believed to have different levels of influence on income.
-To investigate this, the study employs a Generalised Linear Model (GLM)
-with a logistic link function (logistic regression). In addition to this
-traditional statistical approach, we also apply machine learning models
-(e.g., decision trees or random forests) to the same data, allowing us
-to compare their predictive performance and interpretability against the
-GLM results.
+The dataset includes various attributes such as age, education, marital status, occupation, sex, weekly working hours, and nationality. These features are believed to have different levels of influence on income. To investigate this, the study employs a Generalised Linear Model (GLM) with a logistic link function (logistic regression). In addition to this traditional statistical approach, we also apply machine learning models (e.g., decision trees or random forests) to the same data, allowing us to compare their predictive performance and interpretability against the GLM results.
 
 The research objectives are threefold:
 
-1.  **Feature Identification:** Determine which features derived from
-    census data significantly impact an individual's income level,
-    regardless of specific income thresholds.
+1.  **Feature Identification:** Determine which features derived from census data significantly impact an individual's income level, regardless of specific income thresholds.
 
-2.  **Income Classification:** Identify the key factors that influence
-    whether an individual earns more than \$50,000 per year—framing the
-    problem as a binary classification task.
+2.  **Income Classification:** Identify the key factors that influence whether an individual earns more than \$50,000 per year—framing the problem as a binary classification task.
 
-3.  **Practical Implications:** Interpret the model results in
-    real-world terms, providing insight into how demographic or
-    behavioral factors (like education level or working hours) may
-    increase the likelihood of higher earnings, and how such findings
-    could inform social and economic policy.
+3.  **Practical Implications:** Interpret the model results in real-world terms, providing insight into how demographic or behavioral factors (like education level or working hours) may increase the likelihood of higher earnings, and how such findings could inform social and economic policy.
 
-This study also addresses key challenges such as class imbalance,
-multicollinearity, and categorical data encoding, ensuring the
-reliability and relevance of the final model outputs. By combining
-classical statistical modeling with modern machine learning techniques,
-we aim to produce a robust, interpretable, and practically useful
-analysis of income determinants.
+This study also addresses key challenges such as class imbalance, multicollinearity, and categorical data encoding, ensuring the reliability and relevance of the final model outputs. By combining classical statistical modeling with modern machine learning techniques, we aim to produce a robust, interpretable, and practically useful analysis of income determinants.
 
-# Exploratory Data Analysis
+# 2. Exploratory Data Analysis
 
-## Import data and modify the columns
-
-The dataset, derived from the 1994 U.S. Census, was imported with
-missing values represented by `"?"`. After removing rows with any
-missing values (`na.omit()`), the final cleaned dataset contains 30,162
-observations and 8 core variables relevant to individual socioeconomic
-characteristics and income level.
-
-**Variable Transformation**
-
-To improve interpretability and reduce dimensionality, several
-categorical variables were recoded as follows:
-
--   Education: Recoded into a new variable `Education_level` with three
-    ordered categories:
-    1.  \*Lower\* (e.g., primary school)
-    2.  \*Medium\* (e.g., high school, some college)
-    3.  \*Higher\* (e.g., Bachelors, Masters, Doctorate)
--   Marital_Status: Simplified to a binary variable `Has_partner`,
-    indicating whether the individual has a spouse or not.
--   Nationality: Consolidated into two categories:
-    1.  \`US_mainland\` for individuals born in the United States
-    2.  \`Others\` for all other nationalities
--   Occupation: Grouped into four broader categories:
-    1.  \*High-skilled jobs\* (e.g., professionals, tech support,
-        managers)
-    2.  \*Office & Sales jobs\*
-    3.  \*Blue-collar jobs\* (manual labor, machine operation)
-    4.  \*Service & Labor jobs\* (e.g., farming, cleaning, protective
-        services)
-
-Additionally, all character-based variables had trailing commas removed
-to ensure consistency, and data types were properly cast: numeric
-variables (`Age`, `Hours_PW`) and categorical variables (`Sex`,
-`Income`, etc.).
-
-**Descriptive Statistics**
-
-Below is a high-level summary of the main variables after
-transformation:
-
--   Age: Integer variable, with a wide range from young adults to
-    elderly individuals. Summary statistics will help assess age-related
-    income patterns.
-
--   Hours_PW (Hours per Week): Integer variable capturing labor
-    intensity. The average weekly working hours is expected to differ
-    significantly between income groups.
-
--   Sex: Categorical (Male/Female). Used to examine gender-based income
-    disparities.
-
--   Income: Binary factor (`<=50K`, `>50K`), our dependent variable for
-    classification modeling.
-
--   Education_level: Factor with ordered levels. Anticipated to show
-    strong correlation with income.
-
--   Occupation: Reclassified into four interpretable job categories,
-    expected to influence earning potential.
-
--   Nationality: Categorical variable used to capture geographic origin
-    and its socioeconomic implications.
-
--   Has_partner: Binary variable which may reflect family structure and
-    economic stability.
-
-**Initial Observations**
-
--   The dataset is relatively balanced in size and has undergone
-    comprehensive cleaning to remove missing values.
-
--   Clear categorical consolidation has been applied to reduce
-    dimensionality without sacrificing meaning.
-
--   The data is now well-structured and ready for GLM modeling and
-    comparison with machine learning methods.
-
-This preprocessing stage sets a solid foundation for robust model
-estimation and interpretation of income determinants. The modified
-variables are designed to improve both interpretability and statistical
-efficiency in subsequent modeling steps.
+## 1. Import data and modify the columns
 
 ```{r}
 #| message: false
@@ -221,94 +96,71 @@ summary_data <- data.frame(
 kable(summary_data, caption = "Summary of Statistics by Variable")
 ```
 
-The summary statistics provide an overview of the **Age** and **Hours
-Worked Per Week (Hours_PW)** distributions in our dataset. This
-statistical breakdown helps us understand the central tendencies,
-variability, and potential outliers in these variables, which are
-crucial factors in analyzing income distribution.
+The dataset, derived from the 1994 U.S. Census, was imported with missing values represented by `"?"`. After removing rows with any missing values (`na.omit()`), the final cleaned dataset contains **30,162 observations** and **8 core variables** relevant to individual socioeconomic characteristics and income level.
 
-**1. Age Distribution Analysis**
+**Variable Transformation**
 
--   Minimum Age: 17 years old, indicating that the dataset includes
-    young individuals who are likely in the early stages of their
-    careers.
+To improve interpretability and reduce dimensionality, several categorical variables were recoded as follows:
 
--   1st Quartile (Q1): 28 years old, meaning 25% of individuals are 28
-    years or younger.
+-   **Education**: Recoded into a new variable `Education_level` with three ordered categories:
 
--   Median Age: 37 years old, suggesting that half of the individuals
-    are younger than 37 and half are older.
+\- \*Lower\* (e.g., primary school)
 
--   Mean Age: 38.53 years, slightly higher than the median, indicating a
-    right-skewed distribution where some older individuals pull the
-    average age up.
+-   \*Medium\* (e.g., high school, some college)
 
--   3rd Quartile (Q3): 48 years old, meaning 75% of individuals are
-    younger than 48 years.
+-   \*Higher\* (e.g., Bachelors, Masters, Doctorate)
 
--   Maximum Age: 90 years old, suggesting that the dataset includes
-    elderly individuals, though their presence in the workforce is
-    likely minimal.
+-   **Marital_Status**: Simplified to a binary variable `Has_partner`, indicating whether the individual has a spouse or not.
 
-**Key Insight**: The age distribution is fairly balanced, with the
-majority of individuals (50%) falling between 28 and 48 years old. The
-presence of younger individuals (17-28) and older individuals (60+) may
-influence income levels, as younger individuals are likely at
-entry-level positions while older individuals may be near retirement or
-working part-time.
+-   **Nationality**: Consolidated into two categories:
 
-**2. Weekly Working Hours (Hours_PW) Distribution Analysis**
+\- \`US_mainland\` for individuals born in the United States
 
--   Minimum Hours Worked: 3 hours per week, indicating that some
-    individuals work part-time or are in irregular employment.
+-   \`Others\` for all other nationalities
 
--   1st Quartile (Q1): 40 hours per week, meaning 25% of individuals
-    work 40 hours or less, which aligns with standard full-time work
-    expectations.
+-   **Occupation**: Grouped into four broader categories:
 
--   Median Weekly Hours: 40 hours per week, suggesting that at least
-    half of the dataset consists of full-time workers.
+\- \*High-skilled jobs\* (e.g., professionals, tech support, managers)
 
--   Mean Weekly Hours: 41.26 hours, slightly above the median, showing a
-    slightly right-skewed distribution with some individuals working
-    significantly longer hours.
+-   \*Office & Sales jobs\*
 
--   3rd Quartile (Q3): 46 hours per week, meaning 75% of individuals
-    work 46 hours or less, while the remaining 25% work longer hours.
+-   \*Blue-collar jobs\* (manual labor, machine operation)
 
--   Maximum Weekly Hours: 99 hours per week, showing that some
-    individuals work extreme hours, likely in high-responsibility
-    positions or self-employment.
+-   \*Service & Labor jobs\* (e.g., farming, cleaning, protective services)
 
-**Key Insight**: The median and Q1 at 40 hours suggest that full-time
-employment is the norm in this dataset. However, a quarter of
-individuals work more than 46 hours per week, and some extreme cases
-work up to 99 hours, indicating possible correlations between long work
-hours and higher income levels. The presence of individuals working very
-few hours (e.g., 3 hours per week) suggests part-time or low-paying
-jobs, which may be concentrated in the ≤50K income group.
+Additionally, all character-based variables had trailing commas removed to ensure consistency, and data types were properly cast: numeric variables (`Age`, `Hours_PW`) and categorical variables (`Sex`, `Income`, etc.).
 
-**Overall Interpretation**
+**Descriptive Statistics**
 
-1.  Age Distribution and Income: Given that most individuals are between
-    28-48 years old, income levels are likely influenced by career
-    experience, skill accumulation, and job tenure. The presence of
-    young and elderly workers may introduce variation in income
-    classification.
+Below is a high-level summary of the main variables after transformation:
 
-2.  Work Hours and Income: The median 40-hour workweek aligns with
-    full-time employment, but the wide range (3 to 99 hours) suggests
-    significant differences in job type, work commitment, and income
-    potential. Individuals working long hours (\>46 hours) may have a
-    higher likelihood of earning \>50K, whereas those working very short
-    hours (\<20 hours) are likely to be in the ≤50K group.
+-   **Age**: Integer variable, with a wide range from young adults to elderly individuals. Summary statistics will help assess age-related income patterns.
 
-3.  Potential Outliers: Extreme values in age (90 years) and work hours
-    (99 hours) suggest non-standard workforce participation, which may
-    require further filtering or consideration in GLM modeling and
-    machine learning approaches.
+-   **Hours_PW (Hours per Week)**: Integer variable capturing labor intensity. The average weekly working hours is expected to differ significantly between income groups.
 
-## Correlation Analysis and Multicollinearity Check
+-   **Sex**: Categorical (Male/Female). Used to examine gender-based income disparities.
+
+-   **Income**: Binary factor (`<=50K`, `>50K`), our dependent variable for classification modeling.
+
+-   **Education_level**: Factor with ordered levels. Anticipated to show strong correlation with income.
+
+-   **Occupation**: Reclassified into four interpretable job categories, expected to influence earning potential.
+
+-   **Nationality**: Categorical variable used to capture geographic origin and its socioeconomic implications.
+
+-   **Has_partner**: Binary variable which may reflect family structure and economic stability.
+
+**Initial Observations**
+
+-   The dataset is relatively balanced in size and has undergone comprehensive cleaning to remove missing values.
+
+-   Clear categorical consolidation has been applied to reduce dimensionality without sacrificing meaning.
+
+-   The data is now well-structured and ready for GLM modeling and comparison with machine learning methods.
+
+This preprocessing stage sets a solid foundation for robust model estimation and interpretation of income determinants. The modified variables are designed to improve both interpretability and statistical efficiency in subsequent modeling steps.
+
+## 2. Check for Multi-Collinearity issues
 
 ```{r}
 #| message: false
@@ -349,81 +201,7 @@ cor_matrix <- cor(modified_data_numeric)
 corrplot(cor_matrix, method = "color", type = "upper", tl.col = "black", tl.srt = 45)
 ```
 
-The correlation heatmap and the Variance Inflation Factor (VIF) analysis
-provide insight into the relationships between variables and potential
-multicollinearity issues in our dataset. This is a crucial step in model
-building, especially when using Generalized Linear Models (GLM) and
-machine learning, as high multicollinearity can distort coefficient
-estimates and reduce model interpretability.
-
-**1. Correlation Analysis (Heatmap Interpretation):**
-
-The correlation heatmap visualizes pairwise relationships among
-variables, where values range from -1 (strong negative correlation) to
-+1 (strong positive correlation).
-
--   **Strong Positive Correlations**:
-    -   Income & Education Level: Higher education levels are positively
-        associated with higher income.
-
-    -   Income & Has_partner: Married or partnered individuals are more
-        likely to earn higher incomes.
-
-    -   Income & Hours_PW: More weekly working hours are correlated with
-        higher income, though not strongly.
-
-    -   Education Level & Occupation: Higher-skilled jobs tend to be
-        occupied by individuals with higher education levels.
--   **Strong Negative Correlations**:
-    -   Income & Age (Slightly Negative): Older individuals tend to be
-        in both high and low-income categories, making the correlation
-        weaker.
-
-    -   Education Level & Nationality: Suggests that nationality
-        influences education attainment, potentially due to differences
-        in educational systems.
-
-**Key Insight**: Education level, work hours, and marital status appear
-to be the strongest predictors of income, while variables like
-nationality and sex have weaker correlations.
-
-**2. Multicollinearity Check (VIF Analysis):**
-
-To assess multicollinearity, the Variance Inflation Factor (VIF) was
-computed for all predictor variables in the model:
-
--   **VIF Threshold**: A VIF value above 10 indicates severe
-    multicollinearity.
-
--   **Results**:
-
-    -   If no variable had a VIF \> 10, this means multicollinearity is
-        not a serious problem, and all predictors can be used in the
-        regression model.
-
-    -   If some variables exceeded the threshold, they need to be
-        removed or transformed.
-
-**Key Insight**: The absence of high VIF values suggests **no severe
-multicollinearity**, confirming that all independent variables can be
-safely used in GLM modeling without causing instability in coefficient
-estimation.
-
-**Conclusion & Next Steps:**
-
-1.  Income is strongly influenced by education level, marital status,
-    and working hours, making these key variables for predictive
-    modeling.
-
-2.  No serious multicollinearity issues were found, meaning all
-    predictor variables can be retained in the model without causing
-    estimation issues.
-
-3.  The correlation heatmap confirms that income prediction will likely
-    be driven by work-related and demographic factors, aligning with
-    labor market theories.
-
-## Sample Balance Analysis
+## 3. Check sample balance
 
 ```{r}
 #| message: false
@@ -432,40 +210,7 @@ table(modified_data$Income)
 prop.table(table(modified_data$Income))
 ```
 
-**Class Distribution in the Dataset**
-
-Ensuring that our dataset is balanced is crucial for building reliable
-predictive models, particularly for Generalized Linear Models (GLM) and
-machine learning algorithms. A significant class imbalance could lead to
-biased model predictions, favoring the majority class.
-
-From the summary table, we observe the following class distribution for
-income levels (≤50K vs. \>50K):
-
-| Income Category | Count | Proportion |
-|-----------------|-------|------------|
-| ≤50K            | 1030  | 75.24%     |
-| \>50K           | 339   | 24.76%     |
-
-This distribution indicates that approximately 75.24% of individuals
-earn ≤50K per year, while only 24.76% earn \>50K. The dataset is
-imbalanced, with a dominance of lower-income individuals.
-
-**Conclusion & Next Steps**
-
-1.  The dataset is imbalanced, with 75.24% of individuals earning ≤50K
-    and only 24.76% earning \>50K.
-
-2.  This imbalance may impact the model’s predictive ability, leading to
-    biased predictions toward the majority class (≤50K).
-
-3.  As we proceed with further analysis, we anticipate differences in
-    the model’s predictive performance between high-income and
-    low-income groups. This discrepancy highlights a limitation in our
-    model, suggesting the need for further exploration and refinement to
-    address this issue and enhance overall predictive accuracy.
-
-## Data visualization
+## 4. Data visualization
 
 Use chart and plots to summarize the data set.
 
@@ -494,27 +239,17 @@ ggplot(data = modified_data, mapping = aes(x = Occupation, fill = Income)) +
 
 **Occupation vs. Income**
 
-The Figure1 illustrates the relationship between occupation and income
-distribution:
+The Figure1 illustrates the relationship between occupation and income distribution:
 
--   **Blue-collar jobs**: 279 individuals earn **≤50K**, while only 75
-    earn **\>50K**. This suggests that most blue-collar workers remain
-    in the lower-income bracket.
+-   **Blue-collar jobs**: 279 individuals earn **≤50K**, while only 75 earn **\>50K**. This suggests that most blue-collar workers remain in the lower-income bracket.
 
--   **High-skilled jobs**: 225 individuals earn **≤50K**, while a
-    **significant 187 individuals** earn **\>50K**. This group has the
-    **highest proportion** of high earners.
+-   **High-skilled jobs**: 225 individuals earn **≤50K**, while a **significant 187 individuals** earn **\>50K**. This group has the **highest proportion** of high earners.
 
--   **Office & Sales jobs**: 284 individuals earn **≤50K**, whereas only
-    54 individuals earn **\>50K**. This suggests that most individuals
-    in this category remain in lower-income brackets.
+-   **Office & Sales jobs**: 284 individuals earn **≤50K**, whereas only 54 individuals earn **\>50K**. This suggests that most individuals in this category remain in lower-income brackets.
 
--   **Service & Labor jobs**: 242 individuals earn **≤50K**, while only
-    23 exceed the **50K** threshold, indicating **very limited upward
-    income mobility**.
+-   **Service & Labor jobs**: 242 individuals earn **≤50K**, while only 23 exceed the **50K** threshold, indicating **very limited upward income mobility**.
 
-High-skilled jobs show the best income potential, while blue-collar and
-service jobs predominantly fall within the lower-income group.
+High-skilled jobs show the best income potential, while blue-collar and service jobs predominantly fall within the lower-income group.
 
 ```{r}
 #| message: false
@@ -539,17 +274,11 @@ ggplot(data = modified_data, mapping = aes(x = Sex, fill = Income)) +
 
 The Figure2 provides insight into gender-based income disparities:
 
--   **Females**: 383 earn **≤50K**, while only **51 earn \>50K**. This
-    means only **11.8%** of females in the dataset belong to the
-    high-income group.
+-   **Females**: 383 earn **≤50K**, while only **51 earn \>50K**. This means only **11.8%** of females in the dataset belong to the high-income group.
 
--   **Males**: 647 earn **≤50K**, while **288 earn \>50K**. In contrast
-    to females, **30.8%** of males surpass the **50K** income level.
+-   **Males**: 647 earn **≤50K**, while **288 earn \>50K**. In contrast to females, **30.8%** of males surpass the **50K** income level.
 
-Males are nearly three times more likely to earn \>50K than females
-(30.8% vs. 11.8%), indicating a substantial gender wage gap. This could
-be due to occupational segregation, work experience, or systemic wage
-inequality.
+Males are nearly three times more likely to earn \>50K than females (30.8% vs. 11.8%), indicating a substantial gender wage gap. This could be due to occupational segregation, work experience, or systemic wage inequality.
 
 ```{r}
 #| message: false
@@ -574,19 +303,11 @@ ggplot(data = modified_data, mapping = aes(x = Nationality, fill = Income)) +
 
 The Figure3 explores how income distribution varies by nationality:
 
--   **US Mainland-born individuals**: 924 earn **≤50K**, while **316
-    earn \>50K**. This means **25.5%** of this group reaches high-income
-    status.
+-   **US Mainland-born individuals**: 924 earn **≤50K**, while **316 earn \>50K**. This means **25.5%** of this group reaches high-income status.
 
--   **Others (foreign-born individuals)**: 106 earn **≤50K**, whereas
-    only **23 individuals** earn **\>50K**, meaning only **17.8%** enter
-    the high-income bracket.
+-   **Others (foreign-born individuals)**: 106 earn **≤50K**, whereas only **23 individuals** earn **\>50K**, meaning only **17.8%** enter the high-income bracket.
 
-Individuals born in the US Mainland are more likely to earn \>50K
-(25.5%) compared to those born elsewhere (17.8%). This suggests that
-US-born individuals may have an advantage in accessing higher-paying
-jobs, possibly due to factors such as language proficiency, education
-access, or reduced work restrictions.
+Individuals born in the US Mainland are more likely to earn \>50K (25.5%) compared to those born elsewhere (17.8%). This suggests that US-born individuals may have an advantage in accessing higher-paying jobs, possibly due to factors such as language proficiency, education access, or reduced work restrictions.
 
 ```{r}
 #| message: false
@@ -611,23 +332,13 @@ ggplot(data = modified_data, mapping = aes(x = Education_level, fill = Income)) 
 
 The Figure4 examines the impact of education on income:
 
--   **Higher Education (Bachelor’s, Master’s, Doctorate, etc.)**: **165
-    earn ≤50K**, while **173 earn \>50K**. Notably, this is **the only
-    group where more individuals earn \>50K than ≤50K**.
+-   **Higher Education (Bachelor’s, Master’s, Doctorate, etc.)**: **165 earn ≤50K**, while **173 earn \>50K**. Notably, this is **the only group where more individuals earn \>50K than ≤50K**.
 
--   **Medium Education (High school graduates, associate degrees, some
-    college)**: **715 earn ≤50K**, whereas only **153 earn \>50K**,
-    meaning only **17.6% of this group achieves high income**.
+-   **Medium Education (High school graduates, associate degrees, some college)**: **715 earn ≤50K**, whereas only **153 earn \>50K**, meaning only **17.6% of this group achieves high income**.
 
--   **Lower Education (Elementary/Middle school and below)**: **150 earn
-    ≤50K**, and only **13 earn \>50K**, meaning an extremely low
-    **8.0%** of this group surpasses the **50K** income level.
+-   **Lower Education (Elementary/Middle school and below)**: **150 earn ≤50K**, and only **13 earn \>50K**, meaning an extremely low **8.0%** of this group surpasses the **50K** income level.
 
-Higher education significantly increases the probability of earning
-\>50K. Nearly 51.2% of highly educated individuals enter the high-income
-bracket, compared to 17.6% for medium education and just 8.0% for lower
-education. This highlights education as a major determinant of economic
-mobility.
+Higher education significantly increases the probability of earning \>50K. Nearly 51.2% of highly educated individuals enter the high-income bracket, compared to 17.6% for medium education and just 8.0% for lower education. This highlights education as a major determinant of economic mobility.
 
 ```{r}
 #| message: false
@@ -652,17 +363,11 @@ ggplot(data = modified_data, mapping = aes(x = Has_partner, fill = Income)) +
 
 The Figure5 investigates the impact of marital status on income:
 
--   **Individuals without a partner**: **675 earn ≤50K**, while only
-    **44 earn \>50K**. This means only **6.1%** of single individuals
-    surpass the **50K** threshold.
+-   **Individuals without a partner**: **675 earn ≤50K**, while only **44 earn \>50K**. This means only **6.1%** of single individuals surpass the **50K** threshold.
 
--   **Individuals with a partner**: **355 earn ≤50K**, while **295 earn
-    \>50K**, meaning **45.4%** earn \>50K.
+-   **Individuals with a partner**: **355 earn ≤50K**, while **295 earn \>50K**, meaning **45.4%** earn \>50K.
 
-Key Insight: Individuals with a partner are significantly more likely to
-earn \>50K (45.4%) than those without a partner (6.1%). This might be
-due to dual-income households, financial stability, or career
-advancement associated with family life.
+Key Insight: Individuals with a partner are significantly more likely to earn \>50K (45.4%) than those without a partner (6.1%). This might be due to dual-income households, financial stability, or career advancement associated with family life.
 
 ```{r}
 #| message: false
@@ -688,75 +393,53 @@ ggplot(modified_data, aes(x = Income, y = Age, fill = Income)) +
 
 **1. Age vs. Income Analysis (Violin Plot)**
 
-The violin plot visualizes the distribution of age across income levels
-(≤50K vs. \>50K):
+The violin plot visualizes the **distribution of age across income levels (≤50K vs. \>50K)**:
 
--   The ≤50K income group (gray) has a broader and more left-skewed
-    distribution, with a higher density of individuals between 25 and 35
-    years old. This suggests that younger individuals are more likely to
-    earn lower incomes, potentially due to limited work experience and
-    early career positioning.
+-   The **≤50K income group (gray)** has a **broader and more left-skewed distribution**, with a **higher density of individuals between 25 and 35 years old**. This suggests that **younger individuals are more likely to earn lower incomes**, potentially due to **limited work experience and early career positioning**.
 
--   The \>50K income group (yellow) is more concentrated, with most
-    individuals falling between 35 and 55 years old, indicating that
-    higher earnings are more common among middle-aged individuals.
+-   The **\>50K income group (yellow)** is more concentrated, with most individuals **falling between 35 and 55 years old**, indicating that **higher earnings are more common among middle-aged individuals**.
 
--   The older population (60+) appears less frequent in both groups,
-    likely due to retirement or workforce transition.
+-   The **older population (60+) appears less frequent in both groups**, likely due to **retirement or workforce transition**.
 
-Key Insight: Individuals aged 35-55 are more likely to earn \>50K,
-aligning with income growth over time as experience accumulates. Younger
-individuals tend to stay in the ≤50K group, supporting the idea that
-career progression plays a critical role in achieving higher income
-levels.
+Key Insight: Individuals aged 35-55 are more likely to earn \>50K, aligning with income growth over time as experience accumulates. Younger individuals tend to stay in the ≤50K group, supporting the idea that career progression plays a critical role in achieving higher income levels.
 
 **2. Age vs. Income Analysis (Boxplot)**
 
-The boxplot further breaks down the age distribution by income level,
-offering a more structured comparison:
+The boxplot further breaks down the **age distribution by income level**, offering a more structured comparison:
 
 -   **≤50K Income Group (Red Boxplot)**:
-    -   Median age: Approximately 35 years old.
 
-    -   Interquartile range (IQR): Most individuals fall between 25 and
-        45 years old.
+```         
+-   **Median age**: Approximately **35 years old**.
 
-    -   Outliers above 70 years old suggest that some older individuals
-        continue working but remain in lower-income brackets.
+-   **Interquartile range (IQR)**: Most individuals fall between **25 and 45 years old**.
+
+-   **Outliers above 70 years old** suggest that some older individuals continue working but remain in lower-income brackets.
+```
+
 -   **\>50K Income Group (Blue Boxplot)**:
-    -   Median age: Closer to 45 years old\*\*, significantly higher
-        than the ≤50K group.
 
-    -   IQR range: Most individuals are between 35 and 55 years old.
+```         
+-   **Median age**: Closer to **45 years old**, significantly higher than the ≤50K group.
 
-    -   Fewer younger individuals (\<30) are present in this group,
-        reinforcing the correlation between work experience and income
-        growth.
+-   **IQR range**: Most individuals are between **35 and 55 years old**.
 
-Key Insight: The median age in the \>50K group is notably higher than in
-the ≤50K group. This suggests that experience and career longevity
-contribute significantly to income levels, and younger individuals are
-far less likely to reach the \>50K threshold.
+-   **Fewer younger individuals (\<30) are present in this group**, reinforcing the correlation between **work experience and income growth**.
+```
+
+Key Insight: The median age in the \>50K group is notably higher than in the ≤50K group. This suggests that experience and career longevity contribute significantly to income levels, and younger individuals are far less likely to reach the \>50K threshold.
 
 **Conclusion**
 
-Both visualizations confirm that age is a significant factor in income
-level:
+Both visualizations confirm that **age is a significant factor in income level**:
 
-1.  Younger individuals (25-35) are concentrated in the ≤50K group,
-    likely due to early career stages and lower seniority.
+1.  **Younger individuals (25-35) are concentrated in the ≤50K group**, likely due to **early career stages and lower seniority**.
 
-2.  Middle-aged individuals (35-55) dominate the \>50K group,
-    reinforcing the positive impact of experience and career advancement
-    on earnings.
+2.  **Middle-aged individuals (35-55) dominate the \>50K group**, reinforcing **the positive impact of experience and career advancement on earnings**.
 
-3.  The median age of high-income earners is \~45, while low-income
-    earners have a median age of \~35, highlighting the age-income
-    relationship.
+3.  **The median age of high-income earners is \~45, while low-income earners have a median age of \~35**, highlighting the **age-income relationship**.
 
-These insights will be valuable in our Generalized Linear Model (GLM)
-and machine learning approaches, as age is expected to be a strong
-predictor of income classification.
+These insights will be valuable in our **Generalized Linear Model (GLM) and machine learning approaches**, as **age is expected to be a strong predictor of income classification**.
 
 ```{r}
 #| message: false
@@ -780,86 +463,65 @@ ggplot(modified_data, aes(x = Income, y = Hours_PW, fill = Income)) +
 
 **1. Hours Worked Per Week vs. Income (Violin Plot Analysis)**
 
-The violin plot visualizes the distribution of weekly working hours
-(Hours_PW) across income levels (≤50K vs. \>50K):
+The violin plot visualizes the distribution of **weekly working hours (Hours_PW) across income levels (≤50K vs. \>50K)**:
 
 -   **≤50K Income Group (gray)**:
-    -   The distribution is more spread out, with a high density of
-        individuals working around 40 hours per week.
 
-    -   A significant portion of individuals works less than 40 hours
-        per week, suggesting that part-time or lower-hour jobs may be
-        contributing factors to lower income.
+```         
+-   The distribution is **more spread out**, with a **high density of individuals working around 40 hours per week**.
 
-    -   The presence of some outliers working more than 75 hours per
-        week but still earning ≤50K may indicate jobs with overtime but
-        lower hourly wages.
+-   A significant portion of individuals works **less than 40 hours per week**, suggesting that part-time or lower-hour jobs may be contributing factors to lower income.
+
+-   The presence of **some outliers working more than 75 hours per week but still earning ≤50K** may indicate jobs with overtime but lower hourly wages.
+```
+
 -   **\>50K Income Group (yellow)**:
-    -   The distribution is more concentrated around 45-50 hours per
-        week, showing that higher-income individuals tend to work longer
-        hours.
 
-    -   The tail of the distribution extends to over 80-100 hours per
-        week, indicating that some high earners work extreme hours,
-        possibly in high-responsibility roles or self-employment.
+```         
+-   The distribution is **more concentrated around 45-50 hours per week**, showing that **higher-income individuals tend to work longer hours**.
 
-Key Insight: Higher-income individuals (\>50K) generally work more hours
-per week, while those working fewer than 40 hours per week rarely earn
-\>50K. This suggests that longer work commitments and job type
-significantly impact income levels.
+-   The tail of the distribution extends to **over 80-100 hours per week**, indicating that **some high earners work extreme hours, possibly in high-responsibility roles or self-employment**.
+```
+
+Key Insight: Higher-income individuals (\>50K) generally work more hours per week, while those working fewer than 40 hours per week rarely earn \>50K. This suggests that longer work commitments and job type significantly impact income levels.
 
 **2. Hours Worked Per Week vs. Income (Boxplot Analysis)**
 
-The boxplot provides a more structured comparison of weekly working
-hours between the two income groups:
+The boxplot provides a more structured comparison of **weekly working hours** between the two income groups:
 
 -   **≤50K Income Group (Red Boxplot)**:
-    -   Median working hours: 40 hours per week, with most individuals
-        working between 35 and 45 hours\*\*.
 
-    -   Interquartile range (IQR): The majority of individuals fall
-        between 25 and 45 hours per week.
+```         
+-   **Median working hours**: **40 hours per week**, with most individuals working between **35 and 45 hours**.
 
-    -   Numerous outliers working beyond 60-70 hours per week but still
-        earning ≤50K, indicating that longer hours do not always
-        correlate with higher income in lower-paying jobs.
+-   **Interquartile range (IQR)**: The majority of individuals fall between **25 and 45 hours per week**.
+
+-   **Numerous outliers working beyond 60-70 hours per week but still earning ≤50K**, indicating that longer hours do not always correlate with higher income in lower-paying jobs.
+```
+
 -   **\>50K Income Group (Blue Boxplot)**:
-    -   Median working hours: closer to 50 hours per week\*\*, higher
-        than the ≤50K group.
 
-    -   IQR Range: Most individuals work between 40 and 55 hours per
-        week, showing a shift toward longer work hours.
+```         
+-   **Median working hours**: **closer to 50 hours per week**, higher than the ≤50K group.
 
-    -   Outliers extending to 80-100 hours per week, reinforcing the
-        observation that some high earners work significantly more hours
-        than the general population.
+-   **IQR Range**: Most individuals work **between 40 and 55 hours per week**, showing a shift toward longer work hours.
 
-Key Insight: The median working hours for \>50K earners is higher
-(around 50 hours per week) than for ≤50K earners (40 hours per week).
-This supports the conclusion that higher income is correlated with
-longer work hours, but extreme hours do not guarantee high earnings. The
-presence of long-hour workers in the ≤50K group suggests wage structure
-and job type are additional influencing factors.
+-   **Outliers extending to 80-100 hours per week**, reinforcing the observation that **some high earners work significantly more hours** than the general population.
+```
+
+Key Insight: The median working hours for \>50K earners is higher (around 50 hours per week) than for ≤50K earners (40 hours per week). This supports the conclusion that higher income is correlated with longer work hours, but extreme hours do not guarantee high earnings. The presence of long-hour workers in the ≤50K group suggests wage structure and job type are additional influencing factors.
 
 **Conclusion**
 
-1.  Higher-income individuals (\>50K) tend to work longer hours, with
-    the median workweek being \~50 hours, whereas lower-income
-    individuals (≤50K) have a median of \~40 hours.
+1.  **Higher-income individuals (\>50K) tend to work longer hours**, with the median workweek being **\~50 hours**, whereas **lower-income individuals (≤50K) have a median of \~40 hours**.
 
-2.  Most individuals working fewer than 40 hours per week remain in the
-    ≤50K category, suggesting that part-time work or shorter-hour jobs
-    are associated with lower earnings.
+2.  **Most individuals working fewer than 40 hours per week remain in the ≤50K category**, suggesting that **part-time work or shorter-hour jobs are associated with lower earnings**.
 
-3.  A small group of individuals working extreme hours (\>80 per week)
-    exists in both income groups, highlighting variability in income
-    generation based on industry and job type.
+3.  **A small group of individuals working extreme hours (\>80 per week) exists in both income groups**, highlighting **variability in income generation based on industry and job type**.
 
-These insights reinforce the importance of work hours as a key variable
-in predicting income and will be valuable for Generalized Linear Model
-(GLM) and machine learning modeling in further analysis.
+These insights reinforce the importance of work hours as a key variable in predicting income and will be valuable for Generalized Linear Model (GLM) and machine learning modeling in further analysis.
 
-# Data Splitting: Training set and Test set
+# 3. Data Splitting: Training set and Test set
 
 ```{r}
 #| message: false
@@ -905,19 +567,13 @@ prop.table(table(training_data$Income))
 prop.table(table(test_data$Income))
 ```
 
-# Statistical Modelling and Results
+# 4. Statistical Modelling and Results
 
-## Statistical Modelling
+## 1. Statistical Modelling
 
-### GLM
+### 1. GLM
 
-<<<<<<< HEAD
 ```{r,results='hide'}
-=======
-#### Model Fitting
-
-```{r}
->>>>>>> 1499775001e0df0beec9192beaf6ae1dc6d63437
 #| message: false
 library(MASS)
 library(caret)
@@ -989,7 +645,6 @@ print(colnames(training_data_GLM))
 
 ```
 
-<<<<<<< HEAD
 #### 1. Model Fitting
 
 ```{r}
@@ -1028,9 +683,6 @@ $$
 where each coefficient represents the estimated impact of the corresponding predictor on the log-odds of earning above \$50K.
 
 #### 2. Model Optimization
-=======
-#### Model Optimization
->>>>>>> 1499775001e0df0beec9192beaf6ae1dc6d63437
 
 ```{r}
 # Load necessary libraries
@@ -1118,42 +770,14 @@ plot(roc_curve) # Plot ROC curve
 
 ```
 
-<<<<<<< HEAD
 During the model optimization process, we applied main effect selection, ANOVA interaction testing, and stepwise AIC optimization to construct a robust model, retaining statistically significant variables (p \< 0.05) while removing non-significant ones (p \> 0.1). The final model achieved a residual deviance of 758.86 and an AIC of 776.86, with six Fisher Scoring iterations, indicating stability. ANOVA testing confirmed significant interaction effects (p \< 0.05), leading to further refinement using stepAIC(), and the model demonstrated strong predictive performance with an AUC of 0.8935. All VIF values are less than 2 and there is no multicollinearity
-=======
-During the model optimization process, we applied main effect selection,
-ANOVA interaction testing, and stepwise AIC optimization to construct a
-robust model, retaining statistically significant variables (p \< 0.05)
-while removing non-significant ones (p \> 0.1). The final model achieved
-a residual deviance of 773.01 and an AIC of 793.01, with six Fisher
-Scoring iterations, indicating stability. ANOVA testing confirmed
-significant interaction effects (p \< 0.05), leading to further
-refinement using stepAIC(), and the model demonstrated strong predictive
-performance with an AUC of 0.8871. Initially, multicollinearity was
-detected (VIF \> 10) for OccupationService_Labor_jobs and its
-interaction with Hours_PW, but after standardizing relevant variables,
-all VIF values fell below 2, effectively resolving the issue.
->>>>>>> 1499775001e0df0beec9192beaf6ae1dc6d63437
 
-#### Analysis and Results
+#### 3. Analysis and Results
 
-<<<<<<< HEAD
 After model optimization, the residual deviance decreased substantially, and the final model achieved an AIC of 776.86, indicating an improved model fit with an optimal balance between complexity and performance; additionally, the ROC-AUC of 0.8935 reflects strong classification ability, the inclusion of interaction terms significantly enhanced model fit, and all GVIF values were below 2, confirming the absence of multicollinearity and overall model stability.
-=======
-After model optimization, the residual deviance decreased substantially
-from 1228.22 to 779.05, and the final model achieved an AIC of 797.05,
-indicating an improved model fit with an optimal balance between
-complexity and performance; additionally, the ROC-AUC of 0.8871 reflects
-strong classification ability, the inclusion of interaction terms
-significantly enhanced model fit (p = 0.0019), and all GVIF values were
-below 2, confirming the absence of multicollinearity and overall model
-stability.
->>>>>>> 1499775001e0df0beec9192beaf6ae1dc6d63437
 
-It can be indicated that GLM model highlighted the following most
-significant factors :
+It can be indicated that GLM model highlighted the following most significant factors :
 
-<<<<<<< HEAD
 -   **Age**: Positively correlated with income, indicating that older individuals are more likely to earn higher wages.
 
 -   **Hours Worked Per Week** (Hours_PW): Strong positive association with income, suggesting that working longer hours significantly increases the likelihood of earning over \$50,000.
@@ -1175,52 +799,10 @@ Practical Implications for Economic and Social Policy
 -   **Marital Status** and **Income Stability**: The strong impact of having a partner on income suggests that social and financial stability may reinforce economic success, supporting policies that promote family security and financial planning.
 
 -   **Regional Disparities**: The significant income advantage for US mainland residents underscores structural differences in labor opportunities, calling for targeted economic policies to reduce income inequality between regions.
-=======
--   **Age**: Positively associated with income, indicating that older
-    individuals tend to earn more.
 
--   **Hours Worked Per Week (Hours_PW)**: A strong positive effect,
-    suggesting that individuals working longer hours are more likely to
-    earn over \$50,000.
+### 2. Random Forest
 
--   **Education Level**: Lower and medium education levels are
-    significantly negatively associated with high income compared to the
-    reference (higher education), underlining the importance of
-    education in income stratification.
-
--   **Has Partner** : A strong positive effect, implying that
-    individuals with a partner are more likely to earn more.
-
--   **Nationality** : Being a US mainland resident significantly
-    increases the likelihood of higher income.
-
--   **Occupation** : This category has a significant negative
-    interaction with working hours, meaning that in labor-intensive
-    jobs, working longer hours doesn't increase income as much as in
-    other occupations.
-
-For practical implications, our findings offer valuable insights for
-**economic and social policy-making**:
-
--   **Educational Attainment**: Investment in higher education yields
-    significant returns in income, suggesting policymakers should
-    prioritize educational access and quality.
-
--   **Work Intensity**: Working longer hours correlates with higher
-    income, especially in non-labor-intensive jobs, which could inform
-    labor regulations and occupational health policies.
-
--   **Marital Status**: The strong influence of having a partner implies
-    social and economic stability may contribute to income potential.
-
--   **Nationality and Residency**: Disparities between mainland and
-    non-mainland residents may highlight structural differences in labor
-    markets.
->>>>>>> 1499775001e0df0beec9192beaf6ae1dc6d63437
-
-### Random Forest
-
-#### Model Fitting
+#### 1. Model Fitting
 
 ```{r}
 library(randomForest)  
@@ -1252,7 +834,7 @@ print(rf_model)
 plot(rf_model) 
 # Extract the first tree in a random forest
 tree <- getTree(rf_model, k = 1, labelVar = TRUE)
-#print(tree)
+print(tree)
 
 # Extract OOB errors
 oob_errors <- rf_model$err.rate
@@ -1295,56 +877,33 @@ plot(roc_curve, col = "blue", main = "ROC Curve for Random Forest Model")
 
 ```
 
-#### Analysis and Results
+#### 2.Analysis and Results
 
-The OOB error rate is 17.06%, which means the model misclassifies
-approximately 17.06% of the training data on average. This is a good
-estimate of the model's generalization error. The model achieves good
-accuracy (80.59%) and a high AUC score (0.8632), indicating strong
-overall performance. However, the lower specificity for the \>50K class
-highlights the need to address class imbalance and refine the model
-further.
+The OOB error rate is 17.06%, which means the model misclassifies approximately 17.06% of the training data on average. This is a good estimate of the model's generalization error. The model achieves good accuracy (80.59%) and a high AUC score (0.8632), indicating strong overall performance. However, the lower specificity for the \>50K class highlights the need to address class imbalance and refine the model further.
 
-It can be indicated that random forest model highlighted the following
-most significant factors :
+It can be indicated that random forest model highlighted the following most significant factors :
 
--   **Has Partner**: The most influential variable in both
-    MeanDecreaseAccuracy and MeanDecreaseGini scores, suggesting a
-    strong correlation between marital status and income.
+-   **Has Partner**: The most influential variable in both MeanDecreaseAccuracy and MeanDecreaseGini scores, suggesting a strong correlation between marital status and income.
 
--   **Education Level**: Higher education was strongly associated with
-    income above \$50,000.
+-   **Education Level**: Higher education was strongly associated with income above \$50,000.
 
--   **Age**: A higher age generally corresponded with a higher
-    likelihood of earning more.
+-   **Age**: A higher age generally corresponded with a higher likelihood of earning more.
 
--   **Occupation**: Professional and specialized jobs showed a strong
-    correlation with higher income.
+-   **Occupation**: Professional and specialized jobs showed a strong correlation with higher income.
 
--   **Weekly Working Hours (Hours_PW)**: More working hours were linked
-    to increased income.
+-   **Weekly Working Hours (Hours_PW)**: More working hours were linked to increased income.
 
-Additionally, **Sex and Nationality** had lower importance scores,
-suggesting that while they contribute to income predictions, their
-impact is relatively minor compared to factors like education and
-occupation.
+Additionally, **Sex and Nationality** had lower importance scores, suggesting that while they contribute to income predictions, their impact is relatively minor compared to factors like education and occupation.
 
-For practical implications, our findings offer valuable insights for
-**economic and social policy-making**:
+For practical implications, our findings offer valuable insights for **economic and social policy-making**:
 
--   **Education and Training Programs**: Policies aimed at increasing
-    access to higher education and vocational training can improve
-    income potential.
+-   **Education and Training Programs**: Policies aimed at increasing access to higher education and vocational training can improve income potential.
 
--   **Workforce and Labor Laws**: The correlation between income and
-    weekly work hours suggests that employment policies, such as wage
-    regulations and overtime laws, play a role in earnings.
+-   **Workforce and Labor Laws**: The correlation between income and weekly work hours suggests that employment policies, such as wage regulations and overtime laws, play a role in earnings.
 
--   **Family and Social Benefits**: The strong impact of marital status
-    on income implies that family-related policies (e.g., tax benefits
-    for married couples) may influence economic stability.
+-   **Family and Social Benefits**: The strong impact of marital status on income implies that family-related policies (e.g., tax benefits for married couples) may influence economic stability.
 
-### Model Comparison
+### 3. Model Comparison
 
 Comparative Summary of Models
 
@@ -1358,51 +917,14 @@ Comparative Summary of Models
 | **Class Balance Sensitivity** | Relatively High | Adjustable via Weighting |
 :::
 
-<<<<<<< HEAD
 While both GLM and Random Forest demonstrate strong predictive performance, GLM proves to be the superior model in this study due to its interpretability, statistical inference, and suitability for policy-oriented research. Unlike the black-box nature of Random Forest, GLM provides explicit coefficients, enabling hypothesis testing and direct interpretation of how factors such as education, working hours, and marital statusinfluence income. Additionally, GLM effectively models interaction effects, revealing significant relationships, such as the limited income benefits of longer working hours in labor-intensive jobs. Multicollinearity was addressed through standardization (VIF \< 2), ensuring model stability.
-=======
-While both GLM and Random Forest demonstrate strong predictive
-performance (AUC: 0.8871 vs. 0.8632), GLM proves to be the superior
-model in this study due to its interpretability, statistical inference,
-and suitability for policy-oriented research. Unlike the black-box
-nature of Random Forest, GLM provides explicit coefficients, enabling
-hypothesis testing and direct interpretation of how factors such as
-education, working hours, and marital statusinfluence income.
-Additionally, GLM effectively models interaction effects, revealing
-significant relationships, such as the limited income benefits of longer
-working hours in labor-intensive jobs. Multicollinearity was addressed
-through standardization (VIF \< 2), ensuring model stability.
->>>>>>> 1499775001e0df0beec9192beaf6ae1dc6d63437
 
-From a policy perspective, GLM's transparency makes it ideal for guiding
-education and labor policies, while Random Forest, despite its
-predictive strength, lacks explanatory power. Thus, GLM is the more
-suitable model for understanding income determinants in this study.
+From a policy perspective, GLM's transparency makes it ideal for guiding education and labor policies, while Random Forest, despite its predictive strength, lacks explanatory power. Thus, GLM is the more suitable model for understanding income determinants in this study.
 
-## Results
+## 2. Results
 
-This study aimed to identify key socioeconomic factors influencing
-income, classify individuals based on their income levels, and provide
-insights for policy implications. The GLM model proved to be the
-superior approach in achieving these objectives, as it explicitly
-quantifies the relationships between predictors and income, allowing for
-statistical inference and hypothesis testing. It revealed that education
-level, weekly working hours, and marital status are significant
-determinants of income, with education playing the most critical role.
-The model also demonstrated that in labor-intensive occupations, working
-longer hours does not necessarily increase income, highlighting
-structural disparities in the labor market.
+This study aimed to identify key socioeconomic factors influencing income, classify individuals based on their income levels, and provide insights for policy implications. The GLM model proved to be the superior approach in achieving these objectives, as it explicitly quantifies the relationships between predictors and income, allowing for statistical inference and hypothesis testing. It revealed that education level, weekly working hours, and marital status are significant determinants of income, with education playing the most critical role. The model also demonstrated that in labor-intensive occupations, working longer hours does not necessarily increase income, highlighting structural disparities in the labor market.
 
-In contrast, while the Random Forest model provided strong predictive
-accuracy, it did not offer the same level of interpretability. It was
-able to capture complex, nonlinear relationships but lacked the ability
-to test the significance of variables or interactions directly. This
-limits its usefulness in understanding why certain factors impact income
-and in making evidence-based policy recommendations.
+In contrast, while the Random Forest model provided strong predictive accuracy, it did not offer the same level of interpretability. It was able to capture complex, nonlinear relationships but lacked the ability to test the significance of variables or interactions directly. This limits its usefulness in understanding why certain factors impact income and in making evidence-based policy recommendations.
 
-Overall, GLM is the more suitable model for this study, as it not only
-classifies income levels effectively but also provides meaningful
-insights into the underlying economic mechanisms. Its ability to model
-interactions and resolve multicollinearity issues ensures robust and
-reliable results, making it a valuable tool for informing education
-policies, labor regulations, and social welfare programs.
+Overall, GLM is the more suitable model for this study, as it not only classifies income levels effectively but also provides meaningful insights into the underlying economic mechanisms. Its ability to model interactions and resolve multicollinearity issues ensures robust and reliable results, making it a valuable tool for informing education policies, labor regulations, and social welfare programs.
