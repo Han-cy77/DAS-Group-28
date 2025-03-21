@@ -184,11 +184,11 @@ The summary statistics provide an overview of the **Age** and **Hours Worked Per
 
 **Overall Interpretation**
 
-1.   Age Distribution and Income: Given that most individuals are between 28-48 years old, income levels are likely influenced by career experience, skill accumulation, and job tenure. The presence of young and elderly workers may introduce variation in income classification.
+1.  Age Distribution and Income: Given that most individuals are between 28-48 years old, income levels are likely influenced by career experience, skill accumulation, and job tenure. The presence of young and elderly workers may introduce variation in income classification.
 
-2.   Work Hours and Income: The median 40-hour workweek aligns with full-time employment, but the wide range (3 to 99 hours) suggests significant differences in job type, work commitment, and income potential. Individuals working long hours (\>46 hours) may have a higher likelihood of earning \>50K, whereas those working very short hours (\<20 hours) are likely to be in the ≤50K group.
+2.  Work Hours and Income: The median 40-hour workweek aligns with full-time employment, but the wide range (3 to 99 hours) suggests significant differences in job type, work commitment, and income potential. Individuals working long hours (\>46 hours) may have a higher likelihood of earning \>50K, whereas those working very short hours (\<20 hours) are likely to be in the ≤50K group.
 
-3.   Potential Outliers: Extreme values in age (90 years) and work hours (99 hours) suggest non-standard workforce participation, which may require further filtering or consideration in GLM modeling and machine learning approaches.
+3.  Potential Outliers: Extreme values in age (90 years) and work hours (99 hours) suggest non-standard workforce participation, which may require further filtering or consideration in GLM modeling and machine learning approaches.
 
 ## 2. Correlation Analysis and Multicollinearity Check
 
@@ -237,8 +237,7 @@ The correlation heatmap and the Variance Inflation Factor (VIF) analysis provide
 
 The correlation heatmap visualizes pairwise relationships among variables, where values range from -1 (strong negative correlation) to +1 (strong positive correlation).
 
--    **Strong Positive Correlations**:
-
+-   **Strong Positive Correlations**:
     -   Income & Education Level: Higher education levels are positively associated with higher income.
 
     -   Income & Has_partner: Married or partnered individuals are more likely to earn higher incomes.
@@ -247,8 +246,9 @@ The correlation heatmap visualizes pairwise relationships among variables, where
 
     -   Education Level & Occupation: Higher-skilled jobs tend to be occupied by individuals with higher education levels.
 
--    **Strong Negative Correlations**:
+<!-- -->
 
+-   **Strong Negative Correlations**:
     -   Income & Age (Slightly Negative): Older individuals tend to be in both high and low-income categories, making the correlation weaker.
 
     -   Education Level & Nationality: Suggests that nationality influences education attainment, potentially due to differences in educational systems.
@@ -271,11 +271,11 @@ To assess multicollinearity, the Variance Inflation Factor (VIF) was computed fo
 
 **Conclusion & Next Steps:**
 
-1.   Income is strongly influenced by education level, marital status, and working hours, making these key variables for predictive modeling.
+1.  Income is strongly influenced by education level, marital status, and working hours, making these key variables for predictive modeling.
 
-2.   No serious multicollinearity issues were found, meaning all predictor variables can be retained in the model without causing estimation issues.
+2.  No serious multicollinearity issues were found, meaning all predictor variables can be retained in the model without causing estimation issues.
 
-3.   The correlation heatmap confirms that income prediction will likely be driven by work-related and demographic factors, aligning with labor market theories.
+3.  The correlation heatmap confirms that income prediction will likely be driven by work-related and demographic factors, aligning with labor market theories.
 
 ## 3. Sample Balance Analysis
 
@@ -301,11 +301,11 @@ This distribution indicates that approximately 75.24% of individuals earn ≤50K
 
 **Conclusion & Next Steps**
 
-1.   The dataset is imbalanced, with 75.24% of individuals earning ≤50K and only 24.76% earning \>50K.
+1.  The dataset is imbalanced, with 75.24% of individuals earning ≤50K and only 24.76% earning \>50K.
 
-2.   This imbalance may impact the model’s predictive ability, leading to biased predictions toward the majority class (≤50K).
+2.  This imbalance may impact the model’s predictive ability, leading to biased predictions toward the majority class (≤50K).
 
-3.   As we proceed with further analysis, we anticipate differences in the model’s predictive performance between high-income and low-income groups. This discrepancy highlights a limitation in our model, suggesting the need for further exploration and refinement to address this issue and enhance overall predictive accuracy.
+3.  As we proceed with further analysis, we anticipate differences in the model’s predictive performance between high-income and low-income groups. This discrepancy highlights a limitation in our model, suggesting the need for further exploration and refinement to address this issue and enhance overall predictive accuracy.
 
 ## 4. Data visualization
 
@@ -510,9 +510,6 @@ The boxplot further breaks down the age distribution by income level, offering a
     -   Interquartile range (IQR): Most individuals fall between 25 and 45 years old.
 
     -   Outliers above 70 years old suggest that some older individuals continue working but remain in lower-income brackets.
-
-<!-- -->
-
 -   **\>50K Income Group (Blue Boxplot)**:
     -   Median age: Closer to 45 years old\*\*, significantly higher than the ≤50K group.
 
@@ -564,9 +561,6 @@ The violin plot visualizes the distribution of weekly working hours (Hours_PW) a
     -   A significant portion of individuals works less than 40 hours per week, suggesting that part-time or lower-hour jobs may be contributing factors to lower income.
 
     -   The presence of some outliers working more than 75 hours per week but still earning ≤50K may indicate jobs with overtime but lower hourly wages.
-
-<!-- -->
-
 -   **\>50K Income Group (yellow)**:
     -   The distribution is more concentrated around 45-50 hours per week, showing that higher-income individuals tend to work longer hours.
 
@@ -584,9 +578,6 @@ The boxplot provides a more structured comparison of weekly working hours betwee
     -   Interquartile range (IQR): The majority of individuals fall between 25 and 45 hours per week.
 
     -   Numerous outliers working beyond 60-70 hours per week but still earning ≤50K, indicating that longer hours do not always correlate with higher income in lower-paying jobs.
-
-<!-- -->
-
 -   **\>50K Income Group (Blue Boxplot)**:
     -   Median working hours: closer to 50 hours per week\*\*, higher than the ≤50K group.
 
