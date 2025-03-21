@@ -245,9 +245,6 @@ The correlation heatmap visualizes pairwise relationships among variables, where
     -   Income & Hours_PW: More weekly working hours are correlated with higher income, though not strongly.
 
     -   Education Level & Occupation: Higher-skilled jobs tend to be occupied by individuals with higher education levels.
-
-<!-- -->
-
 -   **Strong Negative Correlations**:
     -   Income & Age (Slightly Negative): Older individuals tend to be in both high and low-income categories, making the correlation weaker.
 
