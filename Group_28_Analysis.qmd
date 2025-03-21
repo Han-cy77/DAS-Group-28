@@ -56,7 +56,7 @@ modified_data <- modified_data %>%
 
 # delete useless columns
 modified_data <- modified_data %>%
-  select(-c(Education, Marital_Status))
+  dplyr::select(-c(Education, Marital_Status))
 
 
 
@@ -304,6 +304,19 @@ has_partner_dummy <- model.matrix(~ Has_partner - 1, data = training_data)
 sex_dummy <- model.matrix(~ Sex - 1, data = training_data)
 has_partner_dummy <- model.matrix(~ Has_partner - 1, data = training_data)
 
+#Handle non-standard characters
+col_names <- c("OccupationBlue-collar jobs",    
+               "OccupationHigh-skilled jobs",  
+               "OccupationOffice & Sales jobs",  
+               "OccupationService & Labor jobs")
+clean_col_names <- gsub("[^a-zA-Z0-9]", "_", col_names)   
+clean_col_names <- gsub("_+", "_", clean_col_names) 
+clean_col_names <- gsub("_$", "", clean_col_names) 
+print(clean_col_names)
+
+colnames(training_data_GLM)[which(colnames(training_data_GLM) %in% col_names)] <- clean_col_names
+
+
 #Check new variables
 colnames(dummy_variables)
 colnames(education_dummy)
@@ -311,15 +324,17 @@ colnames(nationality_dummy)
 colnames(has_partner_dummy)
 colnames(sex_dummy)
 
+# Define training_data_GLM
+training_data_GLM <- training_data
 # Add the dummy variables into the original dataset
-training_data <- cbind(training_data, dummy_variables)
-training_data <- cbind(training_data, education_dummy)
-training_data <- cbind(training_data, nationality_dummy)
-training_data <- cbind(training_data, has_partner_dummy)
-training_data <- cbind(training_data, sex_dummy)
+training_data_GLM <- cbind(training_data_GLM, dummy_variables)
+training_data_GLM  <- cbind(training_data_GLM, education_dummy)
+training_data_GLM  <- cbind(training_data_GLM, nationality_dummy)
+training_data_GLM  <- cbind(training_data_GLM, has_partner_dummy)
+training_data_GLM  <- cbind(training_data_GLM, sex_dummy)
 
 full_model <- glm(Income ~ (Age + Occupation + Sex + Hours_PW + Nationality + Education_level + Has_partner)^2, 
-                  data = training_data, family = binomial)
+                  data = training_data_GLM , family = binomial)
 
 
 step_model <- stepAIC(full_model, direction = "both", trace = FALSE)
@@ -343,6 +358,7 @@ plot(roc_curve, col = "blue", main = "ROC Curve for Logistic Regression")
 
 pseudo_r2 <- pR2(step_model)
 print(pseudo_r2)
+
 ```
 
 ### 4.1.2 GLM Model optimization
@@ -356,7 +372,7 @@ library(dplyr) # Data manipulation
 
 # Step 1: Select the best main effects model
 base_model <- glm(Income ~ Age + Occupation + Sex + Hours_PW + Nationality + Education_level + Has_partner, 
-                  data = training_data, family = binomial)
+                  data = training_data_GLM , family = binomial)
 
 step_base_model <- stepAIC(base_model, direction = "both", trace = FALSE)
 
@@ -366,7 +382,7 @@ summary(step_base_model)  # View the optimized main effects model
 interaction_model <- glm(Income ~ Age + Occupation + Hours_PW + Nationality + 
                            Education_level + Has_partner +
                            Education_level:Occupation + Hours_PW:Occupation,
-                         data = training_data, family = binomial)
+                         data = training_data_GLM , family = binomial)
 
 anova(step_base_model, interaction_model, test = "Chisq")  # Perform likelihood ratio test
 
@@ -377,17 +393,22 @@ summary(final_model)  # View the final model
 
 # Step 4: Generate dummy variables (Ensure that OccupationService_Labor_jobs exists)
 training_data$Occupation <- as.factor(training_data$Occupation)
-occupation_dummy <- model.matrix(~ Occupation - 1, data = training_data) %>% as.data.frame()
-training_data <- cbind(training_data, occupation_dummy)
+occupation_dummy <- model.matrix(~ Occupation - 1, data = training_data_GLM ) %>% as.data.frame()
+training_data <- cbind(training_data_GLM , occupation_dummy)
 
 # Check if `OccupationService_Labor_jobs` is included
 colnames(training_data)
+
+View(training_data_GLM)
+
+
+
 
 # Step 5: Refit the final optimized model
 final_model_refined <- glm(Income ~ Age + OccupationService_Labor_jobs + Hours_PW + 
                              Nationality + Education_level + Has_partner + 
                              OccupationService_Labor_jobs:Hours_PW, 
-                           family = binomial, data = training_data)
+                           family = binomial, data = training_data_GLM)
 
 summary(final_model_refined)  # Check statistical significance
 
@@ -395,20 +416,20 @@ summary(final_model_refined)  # Check statistical significance
 vif(final_model_refined)
 
 # Standardize variables
-training_data$Hours_PW <- scale(training_data$Hours_PW)
-training_data$OccupationService_Labor_jobs <- scale(training_data$OccupationService_Labor_jobs)
+training_data_GLM $Hours_PW <- scale(training_data_GLM $Hours_PW)
+training_data_GLM $OccupationService_Labor_jobs <- scale(training_data_GLM $OccupationService_Labor_jobs)
 
 # Refit the model
 final_model_refined <- glm(Income ~ Age + OccupationService_Labor_jobs + Hours_PW + 
                              Nationality + Education_level + Has_partner + 
                              OccupationService_Labor_jobs:Hours_PW, 
-                           family = binomial, data = training_data)
+                           family = binomial, data = training_data_GLM )
 
 # Recheck VIF
 vif(final_model_refined)
 
 # Step 7: Compute AUC to evaluate classification performance
-roc_curve <- roc(training_data$Income, fitted(final_model_refined))
+roc_curve <- roc(training_data_GLM $Income, fitted(final_model_refined))
 auc(roc_curve)  # Compute AUC value
 plot(roc_curve) # Plot ROC curve
 
@@ -438,6 +459,7 @@ test_data$Income <- as.factor(test_data$Income)
 training_data$Income <- as.factor(training_data$Income)
 test_data$Income <- as.factor(test_data$Income)
 
+
 # Constructing random forest model
 set.seed(123)  
 rf_model <- randomForest(
@@ -448,8 +470,7 @@ rf_model <- randomForest(
 
 # View model summary
 print(rf_model)
-library(rpart.plot)
-
+plot(rf_model) 
 # Extract the first tree in a random forest
 tree <- getTree(rf_model, k = 1, labelVar = TRUE)
 print(tree)
@@ -468,28 +489,26 @@ ggplot(oob_df, aes(x = Trees, y = OOB_Error)) +
   labs(
     title = "OOB Error Curve for Random Forest",
     x = "Number of Trees",
-    y = "OOB Error") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12))
+    y = "OOB Error") 
+
 
 
 # Variable importance analysis
 importance(rf_model)
 varImpPlot(rf_model, main = "Variable Importance Plot")
 
+#Define test_data_rf
+test_data_rf <- test_data
 # Prediction on test set
-test_data$predicted_prob <- predict(rf_model, newdata = test_data, type = "prob")[, 2]
-test_data$predicted_class <- predict(rf_model, newdata = test_data, type = "response")
+test_data_rf$predicted_prob <- predict(rf_model, newdata = test_data, type = "prob")[, 2]
+test_data_rf$predicted_class <- predict(rf_model, newdata = test_data, type = "response")
 
 # Calculate confusion matrix
-conf_matrix <- confusionMatrix(test_data$predicted_class, test_data$Income)
+conf_matrix <- confusionMatrix(test_data_rf$predicted_class, test_data_rf$Income)
 print(conf_matrix)
 
 # Calculate ROC-AUC
-roc_curve <- roc(test_data$Income, test_data$predicted_prob)
+roc_curve <- roc(test_data_rf$Income, test_data_rf$predicted_prob)
 auc_score <- auc(roc_curve)
 print(auc_score)
 plot(roc_curve, col = "blue", main = "ROC Curve for Random Forest Model")
