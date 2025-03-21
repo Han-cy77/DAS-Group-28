@@ -24,6 +24,58 @@ This study also addresses key challenges such as class imbalance, multicollinear
 
 ## 1. Import data and modify the columns
 
+The dataset, derived from the 1994 U.S. Census, was imported with missing values represented by `"?"`. After removing rows with any missing values (`na.omit()`), the final cleaned dataset contains 30,162 observations and 8 core variables relevant to individual socioeconomic characteristics and income level.
+
+**Variable Transformation**
+
+To improve interpretability and reduce dimensionality, several categorical variables were recoded as follows:
+
+-   Education: Recoded into a new variable `Education_level` with three ordered categories:
+    1.  \*Lower\* (e.g., primary school)
+    2.  \*Medium\* (e.g., high school, some college)
+    3.  \*Higher\* (e.g., Bachelors, Masters, Doctorate)
+-   Marital_Status: Simplified to a binary variable `Has_partner`, indicating whether the individual has a spouse or not.
+-   Nationality: Consolidated into two categories:
+    1.  \`US_mainland\` for individuals born in the United States
+    2.  \`Others\` for all other nationalities
+-   Occupation: Grouped into four broader categories:
+    1.  \*High-skilled jobs\* (e.g., professionals, tech support, managers)
+    2.  \*Office & Sales jobs\*
+    3.  \*Blue-collar jobs\* (manual labor, machine operation)
+    4.  \*Service & Labor jobs\* (e.g., farming, cleaning, protective services)
+
+Additionally, all character-based variables had trailing commas removed to ensure consistency, and data types were properly cast: numeric variables (`Age`, `Hours_PW`) and categorical variables (`Sex`, `Income`, etc.).
+
+**Descriptive Statistics**
+
+Below is a high-level summary of the main variables after transformation:
+
+-   Age: Integer variable, with a wide range from young adults to elderly individuals. Summary statistics will help assess age-related income patterns.
+
+-   Hours_PW (Hours per Week): Integer variable capturing labor intensity. The average weekly working hours is expected to differ significantly between income groups.
+
+-   Sex: Categorical (Male/Female). Used to examine gender-based income disparities.
+
+-   Income: Binary factor (`<=50K`, `>50K`), our dependent variable for classification modeling.
+
+-   Education_level: Factor with ordered levels. Anticipated to show strong correlation with income.
+
+-   Occupation: Reclassified into four interpretable job categories, expected to influence earning potential.
+
+-   Nationality: Categorical variable used to capture geographic origin and its socioeconomic implications.
+
+-   Has_partner: Binary variable which may reflect family structure and economic stability.
+
+**Initial Observations**
+
+-   The dataset is relatively balanced in size and has undergone comprehensive cleaning to remove missing values.
+
+-   Clear categorical consolidation has been applied to reduce dimensionality without sacrificing meaning.
+
+-   The data is now well-structured and ready for GLM modeling and comparison with machine learning methods.
+
+This preprocessing stage sets a solid foundation for robust model estimation and interpretation of income determinants. The modified variables are designed to improve both interpretability and statistical efficiency in subsequent modeling steps.
+
 ```{r}
 #| message: false
 #| echo: true
@@ -96,71 +148,49 @@ summary_data <- data.frame(
 kable(summary_data, caption = "Summary of Statistics by Variable")
 ```
 
-The dataset, derived from the 1994 U.S. Census, was imported with missing values represented by `"?"`. After removing rows with any missing values (`na.omit()`), the final cleaned dataset contains **30,162 observations** and **8 core variables** relevant to individual socioeconomic characteristics and income level.
+The summary statistics provide an overview of the **Age** and **Hours Worked Per Week (Hours_PW)** distributions in our dataset. This statistical breakdown helps us understand the central tendencies, variability, and potential outliers in these variables, which are crucial factors in analyzing income distribution.
 
-**Variable Transformation**
+**1. Age Distribution Analysis**
 
-To improve interpretability and reduce dimensionality, several categorical variables were recoded as follows:
+-   Minimum Age: 17 years old, indicating that the dataset includes young individuals who are likely in the early stages of their careers.
 
--   **Education**: Recoded into a new variable `Education_level` with three ordered categories:
+-   1st Quartile (Q1): 28 years old, meaning 25% of individuals are 28 years or younger.
 
-\- \*Lower\* (e.g., primary school)
+-   Median Age: 37 years old, suggesting that half of the individuals are younger than 37 and half are older.
 
--   \*Medium\* (e.g., high school, some college)
+-   Mean Age: 38.53 years, slightly higher than the median, indicating a right-skewed distribution where some older individuals pull the average age up.
 
--   \*Higher\* (e.g., Bachelors, Masters, Doctorate)
+-   3rd Quartile (Q3): 48 years old, meaning 75% of individuals are younger than 48 years.
 
--   **Marital_Status**: Simplified to a binary variable `Has_partner`, indicating whether the individual has a spouse or not.
+-   Maximum Age: 90 years old, suggesting that the dataset includes elderly individuals, though their presence in the workforce is likely minimal.
 
--   **Nationality**: Consolidated into two categories:
+**Key Insight**: The age distribution is fairly balanced, with the majority of individuals (50%) falling between 28 and 48 years old. The presence of younger individuals (17-28) and older individuals (60+) may influence income levels, as younger individuals are likely at entry-level positions while older individuals may be near retirement or working part-time.
 
-\- \`US_mainland\` for individuals born in the United States
+**2. Weekly Working Hours (Hours_PW) Distribution Analysis**
 
--   \`Others\` for all other nationalities
+-   Minimum Hours Worked: 3 hours per week, indicating that some individuals work part-time or are in irregular employment.
 
--   **Occupation**: Grouped into four broader categories:
+-   1st Quartile (Q1): 40 hours per week, meaning 25% of individuals work 40 hours or less, which aligns with standard full-time work expectations.
 
-\- \*High-skilled jobs\* (e.g., professionals, tech support, managers)
+-   Median Weekly Hours: 40 hours per week, suggesting that at least half of the dataset consists of full-time workers.
 
--   \*Office & Sales jobs\*
+-   Mean Weekly Hours: 41.26 hours, slightly above the median, showing a slightly right-skewed distribution with some individuals working significantly longer hours.
 
--   \*Blue-collar jobs\* (manual labor, machine operation)
+-   3rd Quartile (Q3): 46 hours per week, meaning 75% of individuals work 46 hours or less, while the remaining 25% work longer hours.
 
--   \*Service & Labor jobs\* (e.g., farming, cleaning, protective services)
+-   Maximum Weekly Hours: 99 hours per week, showing that some individuals work extreme hours, likely in high-responsibility positions or self-employment.
 
-Additionally, all character-based variables had trailing commas removed to ensure consistency, and data types were properly cast: numeric variables (`Age`, `Hours_PW`) and categorical variables (`Sex`, `Income`, etc.).
+**Key Insight**: The median and Q1 at 40 hours suggest that full-time employment is the norm in this dataset. However, a quarter of individuals work more than 46 hours per week, and some extreme cases work up to 99 hours, indicating possible correlations between long work hours and higher income levels. The presence of individuals working very few hours (e.g., 3 hours per week) suggests part-time or low-paying jobs, which may be concentrated in the ≤50K income group.
 
-**Descriptive Statistics**
+**Overall Interpretation**
 
-Below is a high-level summary of the main variables after transformation:
+1.   Age Distribution and Income: Given that most individuals are between 28-48 years old, income levels are likely influenced by career experience, skill accumulation, and job tenure. The presence of young and elderly workers may introduce variation in income classification.
 
--   **Age**: Integer variable, with a wide range from young adults to elderly individuals. Summary statistics will help assess age-related income patterns.
+2.   Work Hours and Income: The median 40-hour workweek aligns with full-time employment, but the wide range (3 to 99 hours) suggests significant differences in job type, work commitment, and income potential. Individuals working long hours (\>46 hours) may have a higher likelihood of earning \>50K, whereas those working very short hours (\<20 hours) are likely to be in the ≤50K group.
 
--   **Hours_PW (Hours per Week)**: Integer variable capturing labor intensity. The average weekly working hours is expected to differ significantly between income groups.
+3.   Potential Outliers: Extreme values in age (90 years) and work hours (99 hours) suggest non-standard workforce participation, which may require further filtering or consideration in GLM modeling and machine learning approaches.
 
--   **Sex**: Categorical (Male/Female). Used to examine gender-based income disparities.
-
--   **Income**: Binary factor (`<=50K`, `>50K`), our dependent variable for classification modeling.
-
--   **Education_level**: Factor with ordered levels. Anticipated to show strong correlation with income.
-
--   **Occupation**: Reclassified into four interpretable job categories, expected to influence earning potential.
-
--   **Nationality**: Categorical variable used to capture geographic origin and its socioeconomic implications.
-
--   **Has_partner**: Binary variable which may reflect family structure and economic stability.
-
-**Initial Observations**
-
--   The dataset is relatively balanced in size and has undergone comprehensive cleaning to remove missing values.
-
--   Clear categorical consolidation has been applied to reduce dimensionality without sacrificing meaning.
-
--   The data is now well-structured and ready for GLM modeling and comparison with machine learning methods.
-
-This preprocessing stage sets a solid foundation for robust model estimation and interpretation of income determinants. The modified variables are designed to improve both interpretability and statistical efficiency in subsequent modeling steps.
-
-## 2. Check for Multi-Collinearity issues
+## 2. Correlation Analysis and Multicollinearity Check
 
 ```{r}
 #| message: false
@@ -201,7 +231,53 @@ cor_matrix <- cor(modified_data_numeric)
 corrplot(cor_matrix, method = "color", type = "upper", tl.col = "black", tl.srt = 45)
 ```
 
-## 3. Check sample balance
+The correlation heatmap and the Variance Inflation Factor (VIF) analysis provide insight into the relationships between variables and potential multicollinearity issues in our dataset. This is a crucial step in model building, especially when using Generalized Linear Models (GLM) and machine learning, as high multicollinearity can distort coefficient estimates and reduce model interpretability.
+
+**1. Correlation Analysis (Heatmap Interpretation):**
+
+The correlation heatmap visualizes pairwise relationships among variables, where values range from -1 (strong negative correlation) to +1 (strong positive correlation).
+
+-    **Strong Positive Correlations**:
+
+    -   Income & Education Level: Higher education levels are positively associated with higher income.
+
+    -   Income & Has_partner: Married or partnered individuals are more likely to earn higher incomes.
+
+    -   Income & Hours_PW: More weekly working hours are correlated with higher income, though not strongly.
+
+    -   Education Level & Occupation: Higher-skilled jobs tend to be occupied by individuals with higher education levels.
+
+-    **Strong Negative Correlations**:
+
+    -   Income & Age (Slightly Negative): Older individuals tend to be in both high and low-income categories, making the correlation weaker.
+
+    -   Education Level & Nationality: Suggests that nationality influences education attainment, potentially due to differences in educational systems.
+
+**Key Insight**: Education level, work hours, and marital status appear to be the strongest predictors of income, while variables like nationality and sex have weaker correlations.
+
+**2. Multicollinearity Check (VIF Analysis):**
+
+To assess multicollinearity, the Variance Inflation Factor (VIF) was computed for all predictor variables in the model:
+
+-   **VIF Threshold**: A VIF value above 10 indicates severe multicollinearity.
+
+-   **Results**:
+
+    -   If no variable had a VIF \> 10, this means multicollinearity is not a serious problem, and all predictors can be used in the regression model.
+
+    -   If some variables exceeded the threshold, they need to be removed or transformed.
+
+**Key Insight**: The absence of high VIF values suggests **no severe multicollinearity**, confirming that all independent variables can be safely used in GLM modeling without causing instability in coefficient estimation.
+
+**Conclusion & Next Steps:**
+
+1.   Income is strongly influenced by education level, marital status, and working hours, making these key variables for predictive modeling.
+
+2.   No serious multicollinearity issues were found, meaning all predictor variables can be retained in the model without causing estimation issues.
+
+3.   The correlation heatmap confirms that income prediction will likely be driven by work-related and demographic factors, aligning with labor market theories.
+
+## 3. Sample Balance Analysis
 
 ```{r}
 #| message: false
@@ -209,6 +285,27 @@ corrplot(cor_matrix, method = "color", type = "upper", tl.col = "black", tl.srt 
 table(modified_data$Income)
 prop.table(table(modified_data$Income))
 ```
+
+**Class Distribution in the Dataset**
+
+Ensuring that our dataset is balanced is crucial for building reliable predictive models, particularly for Generalized Linear Models (GLM) and machine learning algorithms. A significant class imbalance could lead to biased model predictions, favoring the majority class.
+
+From the summary table, we observe the following class distribution for income levels (≤50K vs. \>50K):
+
+| Income Category | Count | Proportion |
+|-----------------|-------|------------|
+| ≤50K            | 1030  | 75.24%     |
+| \>50K           | 339   | 24.76%     |
+
+This distribution indicates that approximately 75.24% of individuals earn ≤50K per year, while only 24.76% earn \>50K. The dataset is imbalanced, with a dominance of lower-income individuals.
+
+**Conclusion & Next Steps**
+
+1.   The dataset is imbalanced, with 75.24% of individuals earning ≤50K and only 24.76% earning \>50K.
+
+2.   This imbalance may impact the model’s predictive ability, leading to biased predictions toward the majority class (≤50K).
+
+3.   As we proceed with further analysis, we anticipate differences in the model’s predictive performance between high-income and low-income groups. This discrepancy highlights a limitation in our model, suggesting the need for further exploration and refinement to address this issue and enhance overall predictive accuracy.
 
 ## 4. Data visualization
 
@@ -393,53 +490,49 @@ ggplot(modified_data, aes(x = Income, y = Age, fill = Income)) +
 
 **1. Age vs. Income Analysis (Violin Plot)**
 
-The violin plot visualizes the **distribution of age across income levels (≤50K vs. \>50K)**:
+The violin plot visualizes the distribution of age across income levels (≤50K vs. \>50K):
 
--   The **≤50K income group (gray)** has a **broader and more left-skewed distribution**, with a **higher density of individuals between 25 and 35 years old**. This suggests that **younger individuals are more likely to earn lower incomes**, potentially due to **limited work experience and early career positioning**.
+-   The ≤50K income group (gray) has a broader and more left-skewed distribution, with a higher density of individuals between 25 and 35 years old. This suggests that younger individuals are more likely to earn lower incomes, potentially due to limited work experience and early career positioning.
 
--   The **\>50K income group (yellow)** is more concentrated, with most individuals **falling between 35 and 55 years old**, indicating that **higher earnings are more common among middle-aged individuals**.
+-   The \>50K income group (yellow) is more concentrated, with most individuals falling between 35 and 55 years old, indicating that higher earnings are more common among middle-aged individuals.
 
--   The **older population (60+) appears less frequent in both groups**, likely due to **retirement or workforce transition**.
+-   The older population (60+) appears less frequent in both groups, likely due to retirement or workforce transition.
 
 Key Insight: Individuals aged 35-55 are more likely to earn \>50K, aligning with income growth over time as experience accumulates. Younger individuals tend to stay in the ≤50K group, supporting the idea that career progression plays a critical role in achieving higher income levels.
 
 **2. Age vs. Income Analysis (Boxplot)**
 
-The boxplot further breaks down the **age distribution by income level**, offering a more structured comparison:
+The boxplot further breaks down the age distribution by income level, offering a more structured comparison:
 
 -   **≤50K Income Group (Red Boxplot)**:
+    -   Median age: Approximately 35 years old.
 
-```         
--   **Median age**: Approximately **35 years old**.
+    -   Interquartile range (IQR): Most individuals fall between 25 and 45 years old.
 
--   **Interquartile range (IQR)**: Most individuals fall between **25 and 45 years old**.
+    -   Outliers above 70 years old suggest that some older individuals continue working but remain in lower-income brackets.
 
--   **Outliers above 70 years old** suggest that some older individuals continue working but remain in lower-income brackets.
-```
+<!-- -->
 
 -   **\>50K Income Group (Blue Boxplot)**:
+    -   Median age: Closer to 45 years old\*\*, significantly higher than the ≤50K group.
 
-```         
--   **Median age**: Closer to **45 years old**, significantly higher than the ≤50K group.
+    -   IQR range: Most individuals are between 35 and 55 years old.
 
--   **IQR range**: Most individuals are between **35 and 55 years old**.
-
--   **Fewer younger individuals (\<30) are present in this group**, reinforcing the correlation between **work experience and income growth**.
-```
+    -   Fewer younger individuals (\<30) are present in this group, reinforcing the correlation between work experience and income growth.
 
 Key Insight: The median age in the \>50K group is notably higher than in the ≤50K group. This suggests that experience and career longevity contribute significantly to income levels, and younger individuals are far less likely to reach the \>50K threshold.
 
 **Conclusion**
 
-Both visualizations confirm that **age is a significant factor in income level**:
+Both visualizations confirm that age is a significant factor in income level:
 
-1.  **Younger individuals (25-35) are concentrated in the ≤50K group**, likely due to **early career stages and lower seniority**.
+1.  Younger individuals (25-35) are concentrated in the ≤50K group, likely due to early career stages and lower seniority.
 
-2.  **Middle-aged individuals (35-55) dominate the \>50K group**, reinforcing **the positive impact of experience and career advancement on earnings**.
+2.  Middle-aged individuals (35-55) dominate the \>50K group, reinforcing the positive impact of experience and career advancement on earnings.
 
-3.  **The median age of high-income earners is \~45, while low-income earners have a median age of \~35**, highlighting the **age-income relationship**.
+3.  The median age of high-income earners is \~45, while low-income earners have a median age of \~35, highlighting the age-income relationship.
 
-These insights will be valuable in our **Generalized Linear Model (GLM) and machine learning approaches**, as **age is expected to be a strong predictor of income classification**.
+These insights will be valuable in our Generalized Linear Model (GLM) and machine learning approaches, as age is expected to be a strong predictor of income classification.
 
 ```{r}
 #| message: false
@@ -463,61 +556,53 @@ ggplot(modified_data, aes(x = Income, y = Hours_PW, fill = Income)) +
 
 **1. Hours Worked Per Week vs. Income (Violin Plot Analysis)**
 
-The violin plot visualizes the distribution of **weekly working hours (Hours_PW) across income levels (≤50K vs. \>50K)**:
+The violin plot visualizes the distribution of weekly working hours (Hours_PW) across income levels (≤50K vs. \>50K):
 
 -   **≤50K Income Group (gray)**:
+    -   The distribution is more spread out, with a high density of individuals working around 40 hours per week.
 
-```         
--   The distribution is **more spread out**, with a **high density of individuals working around 40 hours per week**.
+    -   A significant portion of individuals works less than 40 hours per week, suggesting that part-time or lower-hour jobs may be contributing factors to lower income.
 
--   A significant portion of individuals works **less than 40 hours per week**, suggesting that part-time or lower-hour jobs may be contributing factors to lower income.
+    -   The presence of some outliers working more than 75 hours per week but still earning ≤50K may indicate jobs with overtime but lower hourly wages.
 
--   The presence of **some outliers working more than 75 hours per week but still earning ≤50K** may indicate jobs with overtime but lower hourly wages.
-```
+<!-- -->
 
 -   **\>50K Income Group (yellow)**:
+    -   The distribution is more concentrated around 45-50 hours per week, showing that higher-income individuals tend to work longer hours.
 
-```         
--   The distribution is **more concentrated around 45-50 hours per week**, showing that **higher-income individuals tend to work longer hours**.
-
--   The tail of the distribution extends to **over 80-100 hours per week**, indicating that **some high earners work extreme hours, possibly in high-responsibility roles or self-employment**.
-```
+    -   The tail of the distribution extends to over 80-100 hours per week, indicating that some high earners work extreme hours, possibly in high-responsibility roles or self-employment.
 
 Key Insight: Higher-income individuals (\>50K) generally work more hours per week, while those working fewer than 40 hours per week rarely earn \>50K. This suggests that longer work commitments and job type significantly impact income levels.
 
 **2. Hours Worked Per Week vs. Income (Boxplot Analysis)**
 
-The boxplot provides a more structured comparison of **weekly working hours** between the two income groups:
+The boxplot provides a more structured comparison of weekly working hours between the two income groups:
 
 -   **≤50K Income Group (Red Boxplot)**:
+    -   Median working hours: 40 hours per week, with most individuals working between 35 and 45 hours\*\*.
 
-```         
--   **Median working hours**: **40 hours per week**, with most individuals working between **35 and 45 hours**.
+    -   Interquartile range (IQR): The majority of individuals fall between 25 and 45 hours per week.
 
--   **Interquartile range (IQR)**: The majority of individuals fall between **25 and 45 hours per week**.
+    -   Numerous outliers working beyond 60-70 hours per week but still earning ≤50K, indicating that longer hours do not always correlate with higher income in lower-paying jobs.
 
--   **Numerous outliers working beyond 60-70 hours per week but still earning ≤50K**, indicating that longer hours do not always correlate with higher income in lower-paying jobs.
-```
+<!-- -->
 
 -   **\>50K Income Group (Blue Boxplot)**:
+    -   Median working hours: closer to 50 hours per week\*\*, higher than the ≤50K group.
 
-```         
--   **Median working hours**: **closer to 50 hours per week**, higher than the ≤50K group.
+    -   IQR Range: Most individuals work between 40 and 55 hours per week, showing a shift toward longer work hours.
 
--   **IQR Range**: Most individuals work **between 40 and 55 hours per week**, showing a shift toward longer work hours.
-
--   **Outliers extending to 80-100 hours per week**, reinforcing the observation that **some high earners work significantly more hours** than the general population.
-```
+    -   Outliers extending to 80-100 hours per week, reinforcing the observation that some high earners work significantly more hours than the general population.
 
 Key Insight: The median working hours for \>50K earners is higher (around 50 hours per week) than for ≤50K earners (40 hours per week). This supports the conclusion that higher income is correlated with longer work hours, but extreme hours do not guarantee high earnings. The presence of long-hour workers in the ≤50K group suggests wage structure and job type are additional influencing factors.
 
 **Conclusion**
 
-1.  **Higher-income individuals (\>50K) tend to work longer hours**, with the median workweek being **\~50 hours**, whereas **lower-income individuals (≤50K) have a median of \~40 hours**.
+1.  Higher-income individuals (\>50K) tend to work longer hours, with the median workweek being \~50 hours, whereas lower-income individuals (≤50K) have a median of \~40 hours.
 
-2.  **Most individuals working fewer than 40 hours per week remain in the ≤50K category**, suggesting that **part-time work or shorter-hour jobs are associated with lower earnings**.
+2.  Most individuals working fewer than 40 hours per week remain in the ≤50K category, suggesting that part-time work or shorter-hour jobs are associated with lower earnings.
 
-3.  **A small group of individuals working extreme hours (\>80 per week) exists in both income groups**, highlighting **variability in income generation based on industry and job type**.
+3.  A small group of individuals working extreme hours (\>80 per week) exists in both income groups, highlighting variability in income generation based on industry and job type.
 
 These insights reinforce the importance of work hours as a key variable in predicting income and will be valuable for Generalized Linear Model (GLM) and machine learning modeling in further analysis.
 
