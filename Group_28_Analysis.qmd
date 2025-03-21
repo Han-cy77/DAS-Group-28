@@ -6,6 +6,20 @@ editor: visual
 
 # 1. Background and Target of Research
 
+With the growing importance of data-informed policymaking, identifying the socioeconomic factors that influence individual income has become a critical area of research. Leveraging the 1994 U.S. Census data, this study seeks to explore how personal and demographic characteristics correlate with income levels, particularly whether an individual earns more than \$50,000 per year.
+
+The dataset includes various attributes such as age, education, marital status, occupation, sex, weekly working hours, and nationality. These features are believed to have different levels of influence on income. To investigate this, the study employs a Generalised Linear Model (GLM) with a logistic link function (logistic regression). In addition to this traditional statistical approach, we also apply machine learning models (e.g., decision trees or random forests) to the same data, allowing us to compare their predictive performance and interpretability against the GLM results.
+
+The research objectives are threefold:
+
+1.  **Feature Identification:** Determine which features derived from census data significantly impact an individual's income level, regardless of specific income thresholds.
+
+2.  **Income Classification:** Identify the key factors that influence whether an individual earns more than \$50,000 per year—framing the problem as a binary classification task.
+
+3.  **Practical Implications:** Interpret the model results in real-world terms, providing insight into how demographic or behavioral factors (like education level or working hours) may increase the likelihood of higher earnings, and how such findings could inform social and economic policy.
+
+This study also addresses key challenges such as class imbalance, multicollinearity, and categorical data encoding, ensuring the reliability and relevance of the final model outputs. By combining classical statistical modeling with modern machine learning techniques, we aim to produce a robust, interpretable, and practically useful analysis of income determinants.
+
 # 2. Exploratory Data analysis
 
 ## 1. Import data and modify the columns
@@ -78,6 +92,76 @@ modified_data$Education_level <- as.factor(modified_data$Education_level)
 modified_data$Has_partner <- as.factor(modified_data$Has_partner)
 str(modified_data)
 ```
+
+The dataset, derived from the 1994 U.S. Census, was imported with missing values represented by `"?"`. After removing rows with any missing values (`na.omit()`), the final cleaned dataset contains **30,162 observations** and **8 core variables** relevant to individual socioeconomic characteristics and income level.
+
+#### **Variable Transformation**
+
+To improve interpretability and reduce dimensionality, several categorical variables were recoded as follows:
+
+-   **Education**: Recoded into a new variable `Education_level` with three ordered categories:
+
+```         
+-   *Lower* (e.g., primary school)
+
+-    *Medium* (e.g., high school, some college)
+
+-    *Higher* (e.g., Bachelors, Masters, Doctorate)
+```
+
+-   **Marital_Status**: Simplified to a binary variable `Has_partner`, indicating whether the individual has a spouse or not.
+
+-   **Nationality**: Consolidated into two categories:
+
+```         
+-    `US_mainland` for individuals born in the United States
+
+-    `Others` for all other nationalities
+```
+
+-   **Occupation**: Grouped into four broader categories:
+
+```         
+-    *High-skilled jobs* (e.g., professionals, tech support, managers)
+
+-    *Office & Sales jobs*
+
+-    *Blue-collar jobs* (manual labor, machine operation)
+
+-    *Service & Labor jobs* (e.g., farming, cleaning, protective services)
+```
+
+Additionally, all character-based variables had trailing commas removed to ensure consistency, and data types were properly cast: numeric variables (`Age`, `Hours_PW`) and categorical variables (`Sex`, `Income`, etc.).
+
+#### **Descriptive Statistics**
+
+Below is a high-level summary of the main variables after transformation:
+
+-   **Age**: Integer variable, with a wide range from young adults to elderly individuals. Summary statistics will help assess age-related income patterns.
+
+-   **Hours_PW (Hours per Week)**: Integer variable capturing labor intensity. The average weekly working hours is expected to differ significantly between income groups.
+
+-   **Sex**: Categorical (Male/Female). Used to examine gender-based income disparities.
+
+-   **Income**: Binary factor (`<=50K`, `>50K`), our dependent variable for classification modeling.
+
+-   **Education_level**: Factor with ordered levels. Anticipated to show strong correlation with income.
+
+-   **Occupation**: Reclassified into four interpretable job categories, expected to influence earning potential.
+
+-   **Nationality**: Categorical variable used to capture geographic origin and its socioeconomic implications.
+
+-   **Has_partner**: Binary variable which may reflect family structure and economic stability.
+
+#### **Initial Observations**
+
+-   The dataset is relatively balanced in size and has undergone comprehensive cleaning to remove missing values.
+
+-   Clear categorical consolidation has been applied to reduce dimensionality without sacrificing meaning.
+
+-   The data is now well-structured and ready for GLM modeling and comparison with machine learning methods.
+
+This preprocessing stage sets a solid foundation for robust model estimation and interpretation of income determinants. The modified variables are designed to improve both interpretability and statistical efficiency in subsequent modeling steps.
 
 ## 2. Check for Multi-Collinearity issues
 
