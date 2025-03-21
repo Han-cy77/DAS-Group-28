@@ -573,114 +573,79 @@ prop.table(table(test_data$Income))
 
 ### 1. GLM
 
-```{r,results='hide'}
+#### 1. Model Fitting
+
+```{r}
 #| message: false
 library(MASS)
 library(caret)
 library(pROC)
 library(pscl)
-library(car) 
-library(dplyr) 
-
-# Define training_data_GLM
-training_data_GLM <- training_data
 
 # Create dummy variables
-dummy_variables <- model.matrix(~ Occupation - 1, data = training_data_GLM)
-education_dummy <- model.matrix(~ Education_level - 1, data = training_data_GLM)
-nationality_dummy <- model.matrix(~ Nationality - 1, data = training_data_GLM)
-has_partner_dummy <- model.matrix(~ Has_partner - 1, data = training_data_GLM)
-sex_dummy <- model.matrix(~ Sex - 1, data = training_data_GLM)
+dummy_variables <- model.matrix(~ Occupation - 1, data = training_data)
+education_dummy <- model.matrix(~ Education_level - 1, data = training_data)
+nationality_dummy <- model.matrix(~ Nationality - 1, data = training_data)
+has_partner_dummy <- model.matrix(~ Has_partner - 1, data = training_data)
+sex_dummy <- model.matrix(~ Sex - 1, data = training_data)
+has_partner_dummy <- model.matrix(~ Has_partner - 1, data = training_data)
 
-# Handle non-standard characters
-# Ensure column names match exactly
-colnames(training_data_GLM) <- trimws(colnames(training_data_GLM))
-
-# Modify the levels of the factor variables to clean special characters
-levels(training_data_GLM$Occupation) <- gsub("[^a-zA-Z0-9]", "_", levels(training_data_GLM$Occupation))
-levels(training_data_GLM$Occupation) <- gsub("_+", "_", levels(training_data_GLM$Occupation))
-levels(training_data_GLM$Occupation) <- gsub("_$", "", levels(training_data_GLM$Occupation))
-
-# Define original column names
+#Handle non-standard characters
 col_names <- c("OccupationBlue-collar jobs",    
                "OccupationHigh-skilled jobs",  
                "OccupationOffice & Sales jobs",  
                "OccupationService & Labor jobs")
+clean_col_names <- gsub("[^a-zA-Z0-9]", "_", col_names)   
+clean_col_names <- gsub("_+", "_", clean_col_names) 
+clean_col_names <- gsub("_$", "", clean_col_names) 
+print(clean_col_names)
+# Define training_data_GLM
+training_data_GLM <- training_data
+colnames(training_data_GLM)[which(colnames(training_data_GLM) %in% col_names)] <- clean_col_names
 
-# Clean column names to remove special characters
-clean_col_names <- gsub("[^a-zA-Z0-9]", "_", col_names)  # Replace non-alphanumeric with _
-clean_col_names <- gsub("_+", "_", clean_col_names)      # Remove multiple underscores
-clean_col_names <- gsub("_$", "", clean_col_names)       # Remove trailing underscore
 
-# Ensure correct mapping between old and new column names
-col_mapping <- setNames(clean_col_names, col_names)  # Create a named vector for mapping
-
-# Apply renaming in the dataset
-colnames(training_data_GLM) <- ifelse(colnames(training_data_GLM) %in% col_names, 
-                                      col_mapping[colnames(training_data_GLM)], 
-                                      colnames(training_data_GLM))
-
-print(colnames(training_data_GLM))
-
-# Remove original categorical variables before merging dummy variables
-training_data_GLM <- training_data_GLM[, !colnames(training_data_GLM) %in% c("Occupation", "Education_level", "Nationality", "Has_partner", "Sex")]
-
-# Check new variables
+#Check new variables
 colnames(dummy_variables)
 colnames(education_dummy)
 colnames(nationality_dummy)
 colnames(has_partner_dummy)
 colnames(sex_dummy)
 
-# Add the dummy variables into the dataset
+
+# Add the dummy variables into the original dataset
 training_data_GLM <- cbind(training_data_GLM, dummy_variables)
-training_data_GLM <- cbind(training_data_GLM, education_dummy)
-training_data_GLM <- cbind(training_data_GLM, nationality_dummy)
-training_data_GLM <- cbind(training_data_GLM, has_partner_dummy)
-training_data_GLM <- cbind(training_data_GLM, sex_dummy)
+training_data_GLM  <- cbind(training_data_GLM, education_dummy)
+training_data_GLM  <- cbind(training_data_GLM, nationality_dummy)
+training_data_GLM  <- cbind(training_data_GLM, has_partner_dummy)
+training_data_GLM  <- cbind(training_data_GLM, sex_dummy)
 
-# Print final dataset structure
-print(colnames(training_data_GLM))
+full_model <- glm(Income ~ (Age + Occupation + Sex + Hours_PW + Nationality + Education_level + Has_partner)^2, 
+                  data = training_data_GLM , family = binomial)
 
+
+step_model <- stepAIC(full_model, direction = "both", trace = FALSE)
+summary(step_model)
+
+
+test_data$predicted_prob <- predict(step_model, newdata = test_data, type = "response")
+test_data$predicted_class <- ifelse(test_data$predicted_prob >= 0.5, ">50K", "<=50K")
+test_data$predicted_class <- factor(test_data$predicted_class, levels = levels(test_data$Income))
+
+
+conf_matrix <- confusionMatrix(test_data$predicted_class, test_data$Income)
+print(conf_matrix)
+
+
+roc_curve <- roc(test_data$Income, test_data$predicted_prob)
+auc_score <- auc(roc_curve)
+print(auc_score)
+plot(roc_curve, col = "blue", main = "ROC Curve for Logistic Regression")
+
+
+pseudo_r2 <- pR2(step_model)
+print(pseudo_r2)
 
 ```
-
-#### 1. Model Fitting
-
-```{r}
-#| message: false
-# Select the best main effects model
-base_model <- glm(Income ~ Age + Hours_PW + 
-                  OccupationHigh_skilled_jobs + OccupationOffice_Sales_jobs + OccupationService_Labor_jobs + 
-                  SexMale + 
-                  NationalityUS_mainland + 
-                  Education_levelLower + Education_levelMedium + 
-                  Has_partnerYes, 
-                  data = training_data_GLM, family = binomial)
-
-# Stepwise variable selection
-step_base_model <- stepAIC(base_model, direction = "both", trace = FALSE)
-
-# View the optimized main effects model
-summary(step_base_model)
-
-```
-
-The original GLM model (contains no interaction terms, only main effect variables) is formulated as follows:
-
-$$
-\log\left(\frac{P(\text{Income} = 1)}{1 - P(\text{Income} = 1)}\right) =
--5.383 + 0.026 \cdot \text{Age} + 0.038 \cdot \text{Hours_PW}  
-+ 0.778 \cdot \text{Occupation}_{\text{High_skilled_jobs}}  
-- 0.387 \cdot \text{Occupation}_{\text{Office_Sales_jobs}}  
-- 0.667 \cdot \text{Occupation}_{\text{Service_Labor_jobs}}  
-+ 0.873 \cdot \text{Nationality}_{\text{US_mainland}}  
-- 2.663 \cdot \text{Education}_{\text{Lower}}  
-- 1.338 \cdot \text{Education}_{\text{Medium}}  
-+ 2.536 \cdot \text{Has_partner}_{\text{Yes}}
-$$
-
-where each coefficient represents the estimated impact of the corresponding predictor on the log-odds of earning above \$50K.
 
 #### 2. Model Optimization
 
@@ -691,114 +656,100 @@ library(car)   # VIF
 library(pROC)  # AUC calculation
 library(dplyr) # Data manipulation
 
-# Step 2: Check interaction effects (using dummy variables)
-interaction_model <- glm(Income ~ Age + Hours_PW + 
-                           OccupationHigh_skilled_jobs + OccupationOffice_Sales_jobs + OccupationService_Labor_jobs +
-                           NationalityUS_mainland + 
-                           Education_levelLower + Education_levelMedium + 
-                           Has_partnerYes +
-                           # Interaction terms (Education_level * Occupation and Hours_PW * Occupation)
-                           Education_levelLower:OccupationHigh_skilled_jobs + 
-                           Education_levelLower:OccupationOffice_Sales_jobs + 
-                           Education_levelLower:OccupationService_Labor_jobs +
-                           Education_levelMedium:OccupationHigh_skilled_jobs + 
-                           Education_levelMedium:OccupationOffice_Sales_jobs + 
-                           Education_levelMedium:OccupationService_Labor_jobs +
-                           Hours_PW:OccupationHigh_skilled_jobs + 
-                           Hours_PW:OccupationOffice_Sales_jobs + 
-                           Hours_PW:OccupationService_Labor_jobs,
-                         data = training_data_GLM, family = binomial)
+# Step 1: Select the best main effects model
+base_model <- glm(Income ~ Age + Occupation + Sex + Hours_PW + Nationality + Education_level + Has_partner, 
+                  data = training_data_GLM , family = binomial)
 
-# Perform likelihood ratio test
-anova(step_base_model, interaction_model, test = "Chisq")
+step_base_model <- stepAIC(base_model, direction = "both", trace = FALSE)
 
-```
+summary(step_base_model)  # View the optimized main effects model
 
-We introduce the interaction term between occupation, education level, and working hours, and evaluate the significance of the interaction effect using the Chi-square Test.
+# Step 2: Check interaction effects
+interaction_model <- glm(Income ~ Age + Occupation + Hours_PW + Nationality + 
+                           Education_level + Has_partner +
+                           Education_level:Occupation + Hours_PW:Occupation,
+                         data = training_data_GLM , family = binomial)
 
-The addition of interaction terms significantly reduced the residual deviation (from 773.01 to 746.88), indicating that the interaction effect improved the fitting ability of the model. The P-value of 0.001949 is significantly lower than 0.05, indicating that the interaction term is statistically significant (rejecting the null hypothesis that the interaction term contributes to the model).
+anova(step_base_model, interaction_model, test = "Chisq")  # Perform likelihood ratio test
 
-```{r}
 # Step 3: Use stepAIC() to select the final model
 final_model <- stepAIC(interaction_model, direction = "both", trace = FALSE)
+
 summary(final_model)  # View the final model
 
-```
+# Step 4: Generate dummy variables (Ensure that OccupationService_Labor_jobs exists)
+training_data$Occupation <- as.factor(training_data$Occupation)
+occupation_dummy <- model.matrix(~ Occupation - 1, data = training_data_GLM ) %>% as.data.frame()
+training_data <- cbind(training_data_GLM , occupation_dummy)
 
-The stepAIC selection method was used to screen variables, and the variables that contributed little to the income prediction were removed to reduce the complexity of the model and improve the interpretability.
+# Check if `OccupationService_Labor_jobs` is included
+colnames(training_data)
 
-```{r}
-# Step 4: Remove non-significant interaction terms and refit model
-final_model_optimized <- glm(Income ~ Age + Hours_PW + 
-                              OccupationHigh_skilled_jobs + 
-                              NationalityUS_mainland + 
-                              Education_levelLower + Education_levelMedium + 
-                              Has_partnerYes +
-                               # Keep only the most significant interaction items
-                              Hours_PW:OccupationService_Labor_jobs,
-                            data = training_data_GLM, family = binomial)
-
-# Check the final model
-summary(final_model_optimized)
-
-```
-
-$$
-\log\left(\frac{P(\text{Income} = 1)}{1 - P(\text{Income} = 1)}\right) =
--4.488 + 0.030 \cdot \text{Age} + 0.479 \cdot \text{Hours_PW}  
-+ 1.050 \cdot \text{Occupation}_{\text{High_skilled_jobs}}  
-+ 1.019 \cdot \text{Nationality}_{\text{US_mainland}}  
-- 2.556 \cdot \text{Education}_{\text{Lower}}  
-- 1.300 \cdot \text{Education}_{\text{Medium}}  
-+ 2.588 \cdot \text{Has_partner}_{\text{Yes}}  
-- 0.423 \cdot \left(\text{Hours_PW} \times \text{Occupation}_{\text{Service_Labor_jobs}}\right)
-$$
-
-Finally, we removed all statistically insignificant (p \> 0.05) interaction terms, keeping only Hours_PW:OccupationService_Labor_jobs, which remained highly significant and contributed strongly to income prediction. Hours_PW:OccupationService_Labor_jobs with a coefficient of -0.423 indicates that in labor-intensive occupations, the impact of increased hours on income is small or may be diminishing
-
-The final model retains the most influential variables while maintaining a low AIC value, ensuring both robustness and interpretability.
-
-```{r}
-# Step 5: Check VIF (Multicollinearity)
-vif(final_model_optimized)
+View(training_data_GLM)
 
 
-# Step 6: Compute AUC to evaluate classification performance
-roc_curve <- roc(training_data_GLM $Income, fitted(final_model_optimized))
+
+
+# Step 5: Refit the final optimized model
+final_model_refined <- glm(Income ~ Age + OccupationService_Labor_jobs + Hours_PW + 
+                             Nationality + Education_level + Has_partner + 
+                             OccupationService_Labor_jobs:Hours_PW, 
+                           family = binomial, data = training_data_GLM)
+
+summary(final_model_refined)  # Check statistical significance
+
+# Step 6: Check VIF (Multicollinearity)
+vif(final_model_refined)
+
+# Standardize variables
+training_data_GLM $Hours_PW <- scale(training_data_GLM $Hours_PW)
+training_data_GLM $OccupationService_Labor_jobs <- scale(training_data_GLM $OccupationService_Labor_jobs)
+
+# Refit the model
+final_model_refined <- glm(Income ~ Age + OccupationService_Labor_jobs + Hours_PW + 
+                             Nationality + Education_level + Has_partner + 
+                             OccupationService_Labor_jobs:Hours_PW, 
+                           family = binomial, data = training_data_GLM )
+
+# Recheck VIF
+vif(final_model_refined)
+
+# Step 7: Compute AUC to evaluate classification performance
+roc_curve <- roc(training_data_GLM $Income, fitted(final_model_refined))
 auc(roc_curve)  # Compute AUC value
 plot(roc_curve) # Plot ROC curve
 
 ```
 
-During the model optimization process, we applied main effect selection, ANOVA interaction testing, and stepwise AIC optimization to construct a robust model, retaining statistically significant variables (p \< 0.05) while removing non-significant ones (p \> 0.1). The final model achieved a residual deviance of 758.86 and an AIC of 776.86, with six Fisher Scoring iterations, indicating stability. ANOVA testing confirmed significant interaction effects (p \< 0.05), leading to further refinement using stepAIC(), and the model demonstrated strong predictive performance with an AUC of 0.8935. All VIF values are less than 2 and there is no multicollinearity
+During the model optimization process, we applied main effect selection, ANOVA interaction testing, and stepwise AIC optimization to construct a robust model, retaining statistically significant variables (p \< 0.05) while removing non-significant ones (p \> 0.1). The final model achieved a residual deviance of 773.01 and an AIC of 793.01, with six Fisher Scoring iterations, indicating stability. ANOVA testing confirmed significant interaction effects (p \< 0.05), leading to further refinement using stepAIC(), and the model demonstrated strong predictive performance with an AUC of 0.8871. Initially, multicollinearity was detected (VIF \> 10) for OccupationService_Labor_jobs and its interaction with Hours_PW, but after standardizing relevant variables, all VIF values fell below 2, effectively resolving the issue.
 
 #### 3. Analysis and Results
 
-After model optimization, the residual deviance decreased substantially, and the final model achieved an AIC of 776.86, indicating an improved model fit with an optimal balance between complexity and performance; additionally, the ROC-AUC of 0.8935 reflects strong classification ability, the inclusion of interaction terms significantly enhanced model fit, and all GVIF values were below 2, confirming the absence of multicollinearity and overall model stability.
+After model optimization, the residual deviance decreased substantially from 1228.22 to 779.05, and the final model achieved an AIC of 797.05, indicating an improved model fit with an optimal balance between complexity and performance; additionally, the ROC-AUC of 0.8871 reflects strong classification ability, the inclusion of interaction terms significantly enhanced model fit (p = 0.0019), and all GVIF values were below 2, confirming the absence of multicollinearity and overall model stability.
 
 It can be indicated that GLM model highlighted the following most significant factors :
 
--   **Age**: Positively correlated with income, indicating that older individuals are more likely to earn higher wages.
+-   **Age**: Positively associated with income, indicating that older individuals tend to earn more.
 
--   **Hours Worked Per Week** (Hours_PW): Strong positive association with income, suggesting that working longer hours significantly increases the likelihood of earning over \$50,000.
+-   **Hours Worked Per Week (Hours_PW)**: A strong positive effect, suggesting that individuals working longer hours are more likely to earn over \$50,000.
 
--   **Education Level**: Lower and medium education levels show a significant negative relationship with high income, reinforcing the crucial role of higher education in achieving higher earnings.
+-   **Education Level**: Lower and medium education levels are significantly negatively associated with high income compared to the reference (higher education), underlining the importance of education in income stratification.
 
--   **Has Partner**: Strongly positive effect , implying that individuals with a partner are significantly more likely to have higher incomes, potentially due to financial and social stability.
+-   **Has Partner** : A strong positive effect, implying that individuals with a partner are more likely to earn more.
 
--   **Nationality**: Being a US mainland resident is significantly associated with higher income , indicating potential economic advantages or structural disparities in labor markets.
+-   **Nationality** : Being a US mainland resident significantly increases the likelihood of higher income.
 
--   **Occupation**: High-skilled jobs have a strong positive effect , while service/labor jobs exhibit a significant interaction with working hours , suggesting that increased working hours in labor-intensive occupations do not contribute as much to income growth as in other job categories.
+-   **Occupation** : This category has a significant negative interaction with working hours, meaning that in labor-intensive jobs, working longer hours doesn't increase income as much as in other occupations.
 
-Practical Implications for Economic and Social Policy
+For practical implications, our findings offer valuable insights for **economic and social policy-making**:
 
--   **Educational Attainment**:The substantial income disparity based on education level suggests that expanding access to higher education could be a key strategy for income mobility.
+-   **Educational Attainment**: Investment in higher education yields significant returns in income, suggesting policymakers should prioritize educational access and quality.
 
--   **Work Intensity**: Longer working hours contribute to higher earnings, but the effectiveness of work intensity depends on occupation type, highlighting the need for policies that balance labor rights and productivity.
+-   **Work Intensity**: Working longer hours correlates with higher income, especially in non-labor-intensive jobs, which could inform labor regulations and occupational health policies.
 
--   **Marital Status** and **Income Stability**: The strong impact of having a partner on income suggests that social and financial stability may reinforce economic success, supporting policies that promote family security and financial planning.
+-   **Marital Status**: The strong influence of having a partner implies social and economic stability may contribute to income potential.
 
--   **Regional Disparities**: The significant income advantage for US mainland residents underscores structural differences in labor opportunities, calling for targeted economic policies to reduce income inequality between regions.
+-   **Nationality and Residency**: Disparities between mainland and non-mainland residents may highlight structural differences in labor markets.
 
 ### 2. Random Forest
 
@@ -909,15 +860,15 @@ Comparative Summary of Models
 
 ::: center
 | Metric | Random Forest Model | GLM Model |
-|----|----|----|
-| **AUC** | 0.8632 | 0.8935 |
+|------------------------|------------------------|------------------------|
+| **AUC** | 0.8632 | 0.8871 |
 | **Interpretability** | Low (Black Box) | Strong |
 | **Interaction Modeling** | Implicitly Included | Explicitly Modeled |
 | **Model Suitability** | Suitable for High-Dimensional, Nonlinear Data | Suitable for Interpretation and Inference |
 | **Class Balance Sensitivity** | Relatively High | Adjustable via Weighting |
 :::
 
-While both GLM and Random Forest demonstrate strong predictive performance, GLM proves to be the superior model in this study due to its interpretability, statistical inference, and suitability for policy-oriented research. Unlike the black-box nature of Random Forest, GLM provides explicit coefficients, enabling hypothesis testing and direct interpretation of how factors such as education, working hours, and marital statusinfluence income. Additionally, GLM effectively models interaction effects, revealing significant relationships, such as the limited income benefits of longer working hours in labor-intensive jobs. Multicollinearity was addressed through standardization (VIF \< 2), ensuring model stability.
+While both GLM and Random Forest demonstrate strong predictive performance (AUC: 0.8871 vs. 0.8632), GLM proves to be the superior model in this study due to its interpretability, statistical inference, and suitability for policy-oriented research. Unlike the black-box nature of Random Forest, GLM provides explicit coefficients, enabling hypothesis testing and direct interpretation of how factors such as education, working hours, and marital statusinfluence income. Additionally, GLM effectively models interaction effects, revealing significant relationships, such as the limited income benefits of longer working hours in labor-intensive jobs. Multicollinearity was addressed through standardization (VIF \< 2), ensuring model stability.
 
 From a policy perspective, GLM's transparency makes it ideal for guiding education and labor policies, while Random Forest, despite its predictive strength, lacks explanatory power. Thus, GLM is the more suitable model for understanding income determinants in this study.
 
