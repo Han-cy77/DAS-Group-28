@@ -1247,7 +1247,7 @@ For practical implications, our findings offer valuable insights for
 
 -   **Nationality and Residency**: Disparities between mainland and
     non-mainland residents may highlight structural differences in labor
-    markets. \### Random Forest
+### Random Forest
 
 #### Model Fitting
 
