@@ -1259,17 +1259,6 @@ library(caret)
 library(pROC)         
 library(rpart.plot)
 
-training_data <- modified_data[training_index, ]
-test_data  <- modified_data[-training_index, ]
-
-training_data$Income <- as.factor(training_data$Income)
-test_data$Income <- as.factor(test_data$Income)
-
-# Ensure that the target variable is a factor type
-training_data$Income <- as.factor(training_data$Income)
-test_data$Income <- as.factor(test_data$Income)
-
-
 # Constructing random forest model
 set.seed(123)  
 rf_model <- randomForest(
@@ -1301,8 +1290,6 @@ ggplot(oob_df, aes(x = Trees, y = OOB_Error)) +
     x = "Number of Trees",
     y = "OOB Error") 
 
-
-
 # Variable importance analysis
 importance(rf_model)
 varImpPlot(rf_model, main = "Variable Importance Plot")
@@ -1322,8 +1309,6 @@ roc_curve <- roc(test_data_rf$Income, test_data_rf$predicted_prob)
 auc_score <- auc(roc_curve)
 print(auc_score)
 plot(roc_curve, col = "blue", main = "ROC Curve for Random Forest Model")
-
-
 ```
 
 #### Analysis and Results
