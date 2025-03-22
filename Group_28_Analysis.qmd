@@ -949,6 +949,7 @@ sex_dummy <- model.matrix(~ Sex - 1, data = training_data_GLM)
 print(colnames(dummy_variables))
 
 # Define）
+# Define
 col_names <- c("OccupationBlue-collar jobs",    
                "OccupationHigh-skilled jobs",  
                "OccupationOffice & Sales jobs",  
@@ -989,7 +990,7 @@ print(colnames(training_data_GLM))
 
 #### Model Fitting
 
-```{r,echo=FALSE}
+```{r}
 #| message: false
 library(MASS)
 library(caret)
@@ -1016,15 +1017,17 @@ The original GLM model (contains no interaction terms, only main effect
 variables) is formulated as follows:
 
 $$
-\log\left(\frac{P(\text{Income} = 1)}{1 - P(\text{Income} = 1)}\right) =
--5.383 + 0.026 \cdot \text{Age} + 0.038 \cdot \text{Hours_PW}  
-+ 0.778 \cdot \text{Occupation}_{\text{High_skilled_jobs}}  
-- 0.387 \cdot \text{Occupation}_{\text{Office_Sales_jobs}}  
-- 0.667 \cdot \text{Occupation}_{\text{Service_Labor_jobs}}  
-+ 0.873 \cdot \text{Nationality}_{\text{US_mainland}}  
-- 2.663 \cdot \text{Education}_{\text{Lower}}  
-- 1.338 \cdot \text{Education}_{\text{Medium}}  
-+ 2.536 \cdot \text{Has_partner}_{\text{Yes}}
+\begin{aligned}
+\log\left(\frac{P(\text{Income} = 1)}{1 - P(\text{Income} = 1)}\right) = 
+  & -5.383 + 0.026 \cdot \text{Age} + 0.038 \cdot \text{Hours\_PW} \\
+  & + 0.778 \cdot \text{Occupation}_{\text{High\_skilled\_jobs}} \\
+  & - 0.387 \cdot \text{Occupation}_{\text{Office\_Sales\_jobs}} \\
+  & - 0.667 \cdot \text{Occupation}_{\text{Service\_Labor\_jobs}} \\
+  & + 0.873 \cdot \text{Nationality}_{\text{US\_mainland}} \\
+  & - 2.663 \cdot \text{Education}_{\text{Lower}} \\
+  & - 1.338 \cdot \text{Education}_{\text{Medium}} \\
+  & + 2.536 \cdot \text{Has\_partner}_{\text{Yes}}
+\end{aligned}
 $$
 
 where each coefficient represents the estimated impact of the
@@ -1096,15 +1099,19 @@ summary(final_model_optimized)
 ```
 
 $$
-\log\left(\frac{P(\text{Income} = 1)}{1 - P(\text{Income} = 1)}\right) =
--5.786 + 0.027 \cdot \text{Age} + 0.043 \cdot \text{Hours_PW}  
-+ 0.914 \cdot \text{Occupation}_{\text{High_skilled_jobs}}  
-+ 0.884 \cdot \text{Nationality}_{\text{US_mainland}}  
-- 2.529 \cdot \text{Education}_{\text{Lower}}  
-- 1.262 \cdot \text{Education}_{\text{Medium}}  
-+ 2.555 \cdot \text{Has_partner}_{\text{Yes}}  
-- 0.019 \cdot \left(\text{Hours_PW} \times \text{Occupation}_{\text{Service_Labor_jobs}}\right)
+\begin{aligned}
+\log\left(\frac{P(\text{Income} = 1)}{1 - P(\text{Income} = 1)}\right) = 
+  & -5.383 + 0.026 \cdot \text{Age} + 0.038 \cdot \text{Hours\_PW} \\
+  & + 0.778 \cdot \text{Occupation}_{\text{High\_skilled\_jobs}} \\
+  & - 0.387 \cdot \text{Occupation}_{\text{Office\_Sales\_jobs}} \\
+  & - 0.667 \cdot \text{Occupation}_{\text{Service\_Labor\_jobs}} \\
+  & + 0.873 \cdot \text{Nationality}_{\text{US\_mainland}} \\
+  & - 2.663 \cdot \text{Education}_{\text{Lower}} \\
+  & - 1.338 \cdot \text{Education}_{\text{Medium}} \\
+  & + 2.536 \cdot \text{Has\_partner}_{\text{Yes}}
+\end{aligned}
 $$
+
 
 Finally, we removed all statistically insignificant (p \> 0.05)
 interaction terms, keeping only Hours_PW:OccupationService_Labor_jobs,
