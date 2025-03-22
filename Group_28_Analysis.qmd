@@ -1100,15 +1100,7 @@ summary(final_model_optimized)
 
 $$
 \begin{aligned}
-\log\left(\frac{P(\text{Income} = 1)}{1 - P(\text{Income} = 1)}\right) = 
-  & -5.383 + 0.026 \cdot \text{Age} + 0.038 \cdot \text{Hours\_PW} \\
-  & + 0.778 \cdot \text{Occupation}_{\text{High\_skilled\_jobs}} \\
-  & - 0.387 \cdot \text{Occupation}_{\text{Office\_Sales\_jobs}} \\
-  & - 0.667 \cdot \text{Occupation}_{\text{Service\_Labor\_jobs}} \\
-  & + 0.873 \cdot \text{Nationality}_{\text{US\_mainland}} \\
-  & - 2.663 \cdot \text{Education}_{\text{Lower}} \\
-  & - 1.338 \cdot \text{Education}_{\text{Medium}} \\
-  & + 2.536 \cdot \text{Has\_partner}_{\text{Yes}}
+\log\left(\frac{P(\text{Income} = 1)}{1 - P(\text{Income} = 1)}\right) =   & -5.786 + 0.027 \cdot \text{Age} + 0.043 \cdot \text{Hours\_PW} \\  & + 0.914 \cdot \text{Occupation}_{\text{High\_skilled\_jobs}} \\  & + 0.884 \cdot \text{Nationality}_{\text{US\_mainland}} \\  & - 2.529 \cdot \text{Education}_{\text{Lower}} \\  & - 1.262 \cdot \text{Education}_{\text{Medium}} \\  & + 2.555 \cdot \text{Has\_partner}_{\text{Yes}} \\  & - 0.019 \cdot \left(\text{Hours\_PW} \times \text{Occupation}_{\text{Service\_Labor\_jobs}}\right)
 \end{aligned}
 $$
 
