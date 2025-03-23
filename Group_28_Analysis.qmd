@@ -1390,7 +1390,7 @@ education and labor policies, while Random Forest, despite its
 predictive strength, lacks explanatory power. Thus, GLM is the more
 suitable model for understanding income determinants in this study.
 
-## Results
+# Conclusions and Further Work
 
 This study aimed to identify key socioeconomic factors influencing
 income, classify individuals based on their income levels, and provide
@@ -1417,3 +1417,10 @@ insights into the underlying economic mechanisms. Its ability to model
 interactions and resolve multicollinearity issues ensures robust and
 reliable results, making it a valuable tool for informing education
 policies, labor regulations, and social welfare programs.
+
+To address class imbalance, resampling techniques such as SMOTE and
+undersampling can be applied to improve prediction for the high-income
+group. Additionally, model adjustments should be explored to reduce bias
+toward the majority class (≤\$50K) and enhance minority class
+prediction. For future analysis, gathering more balanced or diverse
+datasets could further improve model performance and fairness.
