@@ -1,55 +1,61 @@
-This study explores the relationship between personal and demographic characteristics and income levels using the 1994 U.S. Census data. The primary focus is on identifying key factors influencing whether an individual earns more than $50,000 per year.
+# 📊 Income Prediction Analysis Based on 1994 U.S. Census Data  
 
-1. Project Structure
+This study explores the relationship between personal and demographic characteristics and income levels using the 1994 U.S. Census data. The primary focus is on identifying key factors influencing whether an individual earns more than $50,000 per year.  
 
-.DS_Store: System file, can be ignored.
+---
 
-.gitignore: Configuration for ignored files in Git.
+## 📁 Project Structure  
 
-DAS-Group-28.Rproj: RStudio project file.
+- **`.DS_Store`** – System file, can be ignored.  
+- **`.gitignore`** – Specifies files to be ignored in Git.  
+- **`DAS-Group-28.Rproj`** – RStudio project file.  
+- **`Group_28_Analysis.html` / `Group_28_Analysis.pdf`** – Analysis report in HTML/PDF format.  
+- **`Group_28_Analysis.qmd`** – Quarto source file for the analysis.  
+- **`dataset28.csv`** – Dataset used for analysis.  
 
-Group_28_Analysis.html: HTML version of the project analysis report.
+---
 
-Group_28_Analysis.pdf: PDF version of the project analysis report.
+## 🔍 Analysis Overview  
 
-Group_28_Analysis.qmd: Quarto source file for the analysis.
+This project involves an in-depth analysis of `dataset28.csv`, covering the following key aspects:  
 
-dataset28.csv: Dataset used for analysis.
+### ✨ 1. Data Cleaning  
+- Handling missing values  
+- Detecting and treating outliers  
+- Ensuring data consistency  
 
-2. Analysis Overview
+### 📊 2. Exploratory Data Analysis (EDA)  
+- Summary statistics and distributions  
+- Data visualization to identify patterns  
 
-In this project, we conducted an in-depth analysis of dataset28.csv, focusing on the following aspects:
+### 📈 3. Statistical Modeling  
+- Building appropriate statistical models  
+- Examining relationships between variables  
+- Making relevant inferences  
 
-Data Cleaning: Handling missing values and outliers to ensure data quality.
+### 📌 4. Result Interpretation  
+- Drawing meaningful conclusions  
+- Providing insights and recommendations  
 
-Exploratory Data Analysis (EDA): Using visualization and statistical methods to understand the dataset's characteristics and uncover potential patterns.
+---
 
-Statistical Modeling: Building appropriate statistical models to examine relationships between variables and draw relevant inferences.
+## ⚙️ How to Use  
 
-Result Interpretation: Drawing conclusions based on the model results and providing insights or recommendations.
+1. **Clone the Repository:** Use `git clone` to download the repository to your local machine.  
 
-3. How to Use
+2. **Open the Project:** Open `DAS-Group-28.Rproj` in RStudio.  
 
-a. Clone the Repository: Use git clone to download the repository to your local machine.
+3. **View the Report:** Open `Group_28_Analysis.html` or `Group_28_Analysis.pdf` to review the detailed analysis and findings.  
 
-b. Open the Project: Open DAS-Group-28.Rproj in RStudio.
+4. **Run the Analysis:** To re-run or modify the analysis, edit and render the `Group_28_Analysis.qmd` file.
 
-c. View the Report: Open Group_28_Analysis.html or Group_28_Analysis.pdf to review the detailed analysis and findings.
+## 👥 Contributors  
 
-d. Run the Analysis: To re-run or modify the analysis, edit and render the Group_28_Analysis.qmd file.
+This project was collaboratively completed by:  
+- 🔹 **Han-cy77**  
+- 🔹 **CHU-00**  
+- 🔹 **June-Bai**  
+- 🔹 **Ning**  
+- 🔹 **Yufei27**  
 
-4. Contributors
-
-This project was collaboratively completed by:
-
-Han-cy77
-
-CHU-00
-
-June-Bai
-
-Ning
-
-Yufei27
-
-We appreciate the contributions of all team members.
+We appreciate the contributions of all team members! 🎉  
