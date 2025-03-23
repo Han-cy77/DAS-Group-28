@@ -4360,14 +4360,15 @@ Prediction &lt;=50K &gt;50K
 <p>From a policy perspective, GLM’s transparency makes it ideal for guiding education and labor policies, while Random Forest, despite its predictive strength, lacks explanatory power. Thus, GLM is the more suitable model for understanding income determinants in this study.</p>
 </section>
 </section>
-<section id="results" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="results"><span class="header-section-number">4.2</span> Results</h2>
+</section>
+<section id="conclusions-and-further-work" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Conclusions and Further Work</h1>
 <p>This study aimed to identify key socioeconomic factors influencing income, classify individuals based on their income levels, and provide insights for policy implications. The GLM model proved to be the superior approach in achieving these objectives, as it explicitly quantifies the relationships between predictors and income, allowing for statistical inference and hypothesis testing. It revealed that education level, weekly working hours, and marital status are significant determinants of income, with education playing the most critical role. The model also demonstrated that in labor-intensive occupations, working longer hours does not necessarily increase income, highlighting structural disparities in the labor market.</p>
 <p>In contrast, while the Random Forest model provided strong predictive accuracy, it did not offer the same level of interpretability. It was able to capture complex, nonlinear relationships but lacked the ability to test the significance of variables or interactions directly. This limits its usefulness in understanding why certain factors impact income and in making evidence-based policy recommendations.</p>
 <p>Overall, GLM is the more suitable model for this study, as it not only classifies income levels effectively but also provides meaningful insights into the underlying economic mechanisms. Its ability to model interactions and resolve multicollinearity issues ensures robust and reliable results, making it a valuable tool for informing education policies, labor regulations, and social welfare programs.</p>
+<p>To address class imbalance, resampling techniques such as SMOTE and undersampling can be applied to improve prediction for the high-income group. Additionally, model adjustments should be explored to reduce bias toward the majority class (≤$50K) and enhance minority class prediction. For future analysis, gathering more balanced or diverse datasets could further improve model performance and fairness.</p>
 <!-- -->
 
-</section>
 </section>
 
 </main>
@@ -6047,7 +6048,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb75-1423"><a href="#cb75-1423" aria-hidden="true" tabindex="-1"></a>predictive strength, lacks explanatory power. Thus, GLM is the more</span>
 <span id="cb75-1424"><a href="#cb75-1424" aria-hidden="true" tabindex="-1"></a>suitable model for understanding income determinants in this study.</span>
 <span id="cb75-1425"><a href="#cb75-1425" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb75-1426"><a href="#cb75-1426" aria-hidden="true" tabindex="-1"></a><span class="fu">## Results</span></span>
+<span id="cb75-1426"><a href="#cb75-1426" aria-hidden="true" tabindex="-1"></a><span class="fu"># Conclusions and Further Work</span></span>
 <span id="cb75-1427"><a href="#cb75-1427" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb75-1428"><a href="#cb75-1428" aria-hidden="true" tabindex="-1"></a>This study aimed to identify key socioeconomic factors influencing</span>
 <span id="cb75-1429"><a href="#cb75-1429" aria-hidden="true" tabindex="-1"></a>income, classify individuals based on their income levels, and provide</span>
@@ -6074,6 +6075,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb75-1450"><a href="#cb75-1450" aria-hidden="true" tabindex="-1"></a>interactions and resolve multicollinearity issues ensures robust and</span>
 <span id="cb75-1451"><a href="#cb75-1451" aria-hidden="true" tabindex="-1"></a>reliable results, making it a valuable tool for informing education</span>
 <span id="cb75-1452"><a href="#cb75-1452" aria-hidden="true" tabindex="-1"></a>policies, labor regulations, and social welfare programs.</span>
+<span id="cb75-1453"><a href="#cb75-1453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-1454"><a href="#cb75-1454" aria-hidden="true" tabindex="-1"></a>To address class imbalance, resampling techniques such as SMOTE and</span>
+<span id="cb75-1455"><a href="#cb75-1455" aria-hidden="true" tabindex="-1"></a>undersampling can be applied to improve prediction for the high-income</span>
+<span id="cb75-1456"><a href="#cb75-1456" aria-hidden="true" tabindex="-1"></a>group. Additionally, model adjustments should be explored to reduce bias</span>
+<span id="cb75-1457"><a href="#cb75-1457" aria-hidden="true" tabindex="-1"></a>toward the majority class (≤\$50K) and enhance minority class</span>
+<span id="cb75-1458"><a href="#cb75-1458" aria-hidden="true" tabindex="-1"></a>prediction. For future analysis, gathering more balanced or diverse</span>
+<span id="cb75-1459"><a href="#cb75-1459" aria-hidden="true" tabindex="-1"></a>datasets could further improve model performance and fairness.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
